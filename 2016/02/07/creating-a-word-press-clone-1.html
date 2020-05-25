@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="initial-scale=1, viewport-fit=cover">
+    <meta name="google-site-verification" content="w449-YRInXMviD2YBTfFdb9hs54JylYloEurwuY9-nQ" />
+    <link rel="stylesheet" href="/assets/main.css"><!-- Begin Jekyll SEO tag v2.6.1 -->
+    <title>Creating a WordPress Clone with Ruby on Rails and Ember JS Part I | Weinert Works</title>
+    <meta name="generator" content="Jekyll v4.0.1" />
+    <meta property="og:title" content="Creating a WordPress Clone with Ruby on Rails and Ember JS Part I" />
+    <meta name="author" content="Jim" />
+    <meta property="og:locale" content="en_US" />
+    <meta name="description" content="Goals" />
+    <meta property="og:description" content="Goals" />
+    <link rel="canonical" href="http://localhost:4000/2016/02/07/creating-a-word-press-clone-1.html" />
+    <meta property="og:url" content="http://localhost:4000/2016/02/07/creating-a-word-press-clone-1.html" />
+    <meta property="og:site_name" content="Weinert Works" />
+    <meta property="og:type" content="article" />
+    <meta property="article:published_time" content="2016-02-07T00:19:20-06:00" />
+    <script type="application/ld+json">
+      {"@type":"BlogPosting","mainEntityOfPage":{"@type":"WebPage","@id":"http://localhost:4000/2016/02/07/creating-a-word-press-clone-1.html"},"url":"http://localhost:4000/2016/02/07/creating-a-word-press-clone-1.html","author":{"@type":"Person","name":"Jim"},"description":"Goals","headline":"Creating a WordPress Clone with Ruby on Rails and Ember JS Part I","dateModified":"2016-02-07T00:19:20-06:00","datePublished":"2016-02-07T00:19:20-06:00","@context":"https://schema.org"}
+    </script>
+    <!-- End Jekyll SEO tag -->
+    <link type="application/atom+xml" rel="alternate" href="http://localhost:4000/feed.xml" title="Weinert Works" /></head>
+  <body>
+    <header class="site-header">
+      <div class="container">
+        <a class="site-title" href="/">Weinert Works</a>
+        <nav class="site-nav">
+          <ul>
+            <li><a class="page-link" href="/">Blog</a></li>
+            <li><a class="page-link" href="/feed.xml">RSS</a></li>
+          </ul>
+        </nav>
+      </div>
+    </header>
+    <main class="page-content container" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+          <header class="post-header">
+            <h1 class="post-title p-name" itemprop="name headline">Creating a WordPress Clone with Ruby on Rails and Ember JS Part I</h1>
+            <p class="post-meta">
+              <time class="dt-published" datetime="2016-02-07T00:19:20-06:00" itemprop="datePublished">
+                Feb 7, 2016
+              </time>• <span itemprop="author" itemscope itemtype="http://schema.org/Person"><span class="p-author h-card" itemprop="name">Jim</span></span></p>
+          </header>
+          <div class="post-content e-content" itemprop="articleBody">
+            <h2 id="goals">Goals</h2>
+            <p>I really want to set up a WordPress blog, but I don’t like php, I hate having to configure WordPress, and I don’t want to worry about security problems. You should choose the programming languages and tools that fit your personality. Both Ruby on Rails and Ember JS have friendly communities and <a href="#paperbackwriter-1-aside1">good documentation</a>. Rust has a great community too, but my Rust is rusty.</p>
+            <p>Most programming tutorials stop once you have a working prototype. You never end up learning how to properly use a language or framework unless you’re using it at work. This guide is going to follow my entire process from coding to deployment. I’m going to assume you’ve seen some Rails tutorials but also that you’re starting on Rails 5 from scratch.</p>
+            <h2 id="the-plan">The Plan</h2>
+            <p>Our WordPress clone, which I’m going to call PaperbackWriter, will be a Rails app that serves cached Rails views. I hope it’s as fast and cheap to serve Rails views as static HTML pages. If they’re not, we’ll figure it out. Because HTML forms are awful, even using Rails, we will make an Admin section using EmberJS. We’ll need to build authentication and a process for password resets. I don’t know what I want to do about deployment. I’d like PaperbackWriter to live on a cheap 1 processor, 512GB RAM Linux install in the cloud, but I also want it to be able to kick WPEngine in the teeth.</p>
+            <h2 id="step-1---installing-ruby-and-ruby-on-rails">Step 1 - Installing Ruby and Ruby on Rails</h2>
+            <ul>
+              <li><a href="https://www.ruby-lang.org/en/">https://www.ruby-lang.org/en/</a></li>
+              <li><a href="https://github.com/postmodern/chruby/wiki/Ruby">https://github.com/postmodern/chruby/wiki/Ruby</a></li>
+              <li><a href="https://rubygems.org/gems/rails">https://rubygems.org/gems/rails</a></li>
+            </ul>
+            <p>The first thing we need to do is install Ruby. Mac OS X ships with too old of a version of Ruby to support the latest Rails. At the time of writing most recent Ruby is version 2.3.0. You can download it yourself, but I’d rather use a Ruby manager. I like compiling my own Ruby and installing it to /opt/rubies/. I HATE having Ruby installed in my home directory. I back up my home directory. I don’t want to waste space on a Rails install. <a href="https://github.com/postmodern/chruby">Chruby</a> does everything I want, and their documentation is amazing. Follow their instructions and install Ruby 2.3.0. If you’re reading this <em>from the future!</em> install whichever Ruby version is the newest.</p>
+            <p>Since Ruby on Rails 5 will be released by the time this series finishes, we’re going to use the latest Rails 5 beta. I’m sorry if you’re following along on Windows. I know it has some issues.</p>
+            <p>First we need to check on <a href="https://rubygems.org/gems/rails">Ruby gems</a> what the latest version of Rails 5 is available. In the present, it is still 5 beta2!.</p>
+            <p>Install rails by running the command below. We’ll also need the bundler gem.</p>
+            <figure class="highlight">
+              <pre><code class="language-shell" data-lang="shell">gem <span class="nb">install </span>rails <span class="nt">-v</span> 5.0.0.beta2 bundler</code></pre>
+            </figure>
+            <p>With rails 5 installed, let’s create a new Rails app named paperbackwriter.</p>
+            <figure class="highlight">
+              <pre><code class="language-shell" data-lang="shell">rails new paperbackwriter <span class="nt">-B</span> <span class="nt">--database</span><span class="o">=</span>postgresql</code></pre>
+            </figure>
+            <p>Adding the -B flag prevents bundle install from being run. We’re going to make some changes to the Gemfile before we install the Rails dependencies.</p>
+            <p>Postgres is the best open source database not owned by <a href="#paperbackwriter-1-aside2">Oracle</a>. Since we’re planning to deploy this to a server, we should start working with postgresql now.</p>
+            <h2 id="step-2---installing-postgres">Step 2 - Installing Postgres</h2>
+            <ul>
+              <li><a href="https://www.sqlite.org">sqlite.org</a></li>
+              <li><a href="http://www.postgresql.org/download/macosx/">postgresql.org</a></li>
+              <li><a href="http://brew.sh">brew.sh</a></li>
+            </ul>
+            <p>By default Ruby on Rails will use <a href="https://www.sqlite.org">sqlite</a> as your database. That works fine for testing and some production apps, but we want to develop our app the same way it will run in production. This improves our chances of catching bugs before we deploy. Another reason is your laptop/desktop is way more powerful than the <a href="#paperbackwriter-1-aside3">tiny virtual server</a> on which we’re planning to run our app. If you write a database query that’s slow on your development machine, it’ll be dead slow in production.</p>
+            <p>The best way to install Postgresql is using <a href="http://brew.sh">Homebrew</a>, the best Mac OS X package manager. Install Homebrew if you don’t already have it running. Then run the command in <a href="http://blog.teamtreehouse.com/introduction-to-the-mac-os-x-command-line">Terminal</a>.</p>
+            <figure class="highlight">
+              <pre><code class="language-shell" data-lang="shell">brew <span class="nb">install </span>postgres</code></pre>
+            </figure>
+            <p>Homebrew will display instructions for starting Postgres. I prefer to create a symbolic link from Postgres’s property list file to the LaunchAgents directory. This will start Postgres when our machine boots. I’ve spent way too much time trying to figure out why an app wasn’t working when the database wasn’t running yet. Since the database will only be used when our app is running, it should not hog our machine’s resources.</p>
+            <h2 id="step-3---updating-our-gemfile">Step 3 - Updating Our Gemfile</h2>
+            <ul>
+              <li><a href="12factor.net">12factor.net</a></li>
+              <li><a href="https://github.com/bkeepers/dotenv">https://github.com/bkeepers/dotenv</a></li>
+              <li><a href="https://github.com/rails-api/active_model_serializers">https://github.com/rails-api/active_model_serializers</a></li>
+            </ul>
+            <p>The default Rails Gemfile in the top level directory should look something like this.</p>
+            <figure class="highlight">
+              <pre><code class="language-ruby" data-lang="ruby"><span class="c1"># Gemfile</span>
+<span class="n">source</span> <span class="s1">'https://rubygems.org'</span>
+
+<span class="c1"># Bundle edge Rails instead: gem 'rails', github: 'rails/rails'</span>
+<span class="n">gem</span> <span class="s1">'rails'</span><span class="p">,</span> <span class="s1">'&gt;= 5.0.0.beta2'</span><span class="p">,</span> <span class="s1">'&lt; 5.1'</span>
+<span class="c1"># Use postgresql as the database for Active Record</span>
+<span class="n">gem</span> <span class="s1">'pg'</span><span class="p">,</span> <span class="s1">'~&gt; 0.18'</span>
+<span class="c1"># Use Uglifier as compressor for JavaScript assets</span>
+<span class="n">gem</span> <span class="s1">'uglifier'</span><span class="p">,</span> <span class="s1">'&gt;= 1.3.0'</span>
+<span class="c1"># Use CoffeeScript for .coffee assets and views</span>
+<span class="n">gem</span> <span class="s1">'coffee-rails'</span><span class="p">,</span> <span class="s1">'~&gt; 4.1.0'</span>
+<span class="c1"># See https://github.com/rails/execjs#readme for more supported runtimes</span>
+<span class="c1"># gem 'therubyracer', platforms: :ruby</span>
+
+<span class="c1"># Use jquery as the JavaScript library</span>
+<span class="n">gem</span> <span class="s1">'jquery-rails'</span>
+<span class="c1"># Turbolinks makes following links in your web application faster. Read more: https://github.com/rails/turbolinks</span>
+<span class="n">gem</span> <span class="s1">'turbolinks'</span>
+<span class="c1"># Build JSON APIs with ease. Read more: https://github.com/rails/jbuilder</span>
+<span class="n">gem</span> <span class="s1">'jbuilder'</span><span class="p">,</span> <span class="s1">'~&gt; 2.0'</span>
+<span class="c1"># Use Puma as the app server</span>
+<span class="n">gem</span> <span class="s1">'puma'</span>
+
+<span class="c1"># Use ActiveModel has_secure_password</span>
+<span class="c1"># gem 'bcrypt', '~&gt; 3.1.7'</span>
+
+<span class="c1"># Use Capistrano for deployment</span>
+<span class="c1"># gem 'capistrano-rails', group: :development</span>
+
+<span class="n">group</span> <span class="ss">:development</span><span class="p">,</span> <span class="ss">:test</span> <span class="k">do</span>
+  <span class="c1"># Call 'byebug' anywhere in the code to stop execution and get a debugger console</span>
+  <span class="n">gem</span> <span class="s1">'byebug'</span>
+<span class="k">end</span>
+
+<span class="n">group</span> <span class="ss">:development</span> <span class="k">do</span>
+  <span class="c1"># Access an IRB console on exception pages or by using &lt;%= console %&gt; in views</span>
+  <span class="n">gem</span> <span class="s1">'web-console'</span><span class="p">,</span> <span class="s1">'~&gt; 3.0'</span>
+  <span class="c1"># Spring speeds up development by keeping your application running in the background. Read more: https://github.com/rails/spring</span>
+  <span class="n">gem</span> <span class="s1">'spring'</span>
+<span class="k">end</span>
+
+<span class="c1"># Windows does not include zoneinfo files, so bundle the tzinfo-data gem</span>
+<span class="n">gem</span> <span class="s1">'tzinfo-data'</span><span class="p">,</span> <span class="ss">platforms: </span><span class="p">[</span><span class="ss">:mingw</span><span class="p">,</span> <span class="ss">:mswin</span><span class="p">,</span> <span class="ss">:x64_mingw</span><span class="p">,</span> <span class="ss">:jruby</span><span class="p">]</span></code></pre>
+            </figure>
+            <p>If we remove the gems we’re not going to use yet, our Gemfile gets a lot thinner. Update your Gemfile to match mine.</p>
+            <figure class="highlight">
+              <pre><code class="language-ruby" data-lang="ruby"><span class="c1"># Gemfile</span>
+<span class="n">source</span> <span class="s1">'https://rubygems.org'</span>
+
+<span class="n">gem</span> <span class="s1">'rails'</span><span class="p">,</span> <span class="s1">'&gt;= 5.0.0.beta2'</span><span class="p">,</span> <span class="s1">'&lt; 5.1'</span>
+<span class="n">gem</span> <span class="s1">'pg'</span>
+<span class="n">gem</span> <span class="s1">'puma'</span>
+
+<span class="n">group</span> <span class="ss">:development</span><span class="p">,</span> <span class="ss">:test</span> <span class="k">do</span>
+  <span class="n">gem</span> <span class="s1">'byebug'</span>
+<span class="k">end</span>
+
+<span class="n">group</span> <span class="ss">:development</span> <span class="k">do</span>
+  <span class="n">gem</span> <span class="s1">'spring'</span>
+<span class="k">end</span></code></pre>
+            </figure>
+            <p>I removed the version from the pg gem. When starting a new project, I prefer to use the latest version of libraries. Bundler will always install the version of a gem listed in the Gemfile.lock file. If we ever need to upgrade a gem, we can upgrade it by itself without changing the versions of the other gems.</p>
+            <p>We want to specify our version of ruby in the Gemfile. Every once in a midnight dream, the wrong version of ruby is loaded. We want bundler to fail if there’s a version mismatch. Add the following line to the top of your Gemfile.</p>
+            <figure class="highlight">
+              <pre><code class="language-ruby" data-lang="ruby"><span class="n">ruby</span> <span class="s1">'2.3.0'</span></code></pre>
+            </figure>
+            <p>My company subscribes to <a href="http://12factor.net">The Twelve Factor App</a>. The Twelve Factor App methods make it super easy to deploy apps. We’re going to follow <a href="http://12factor.net/config">their advice</a> and store all of our configuration options as environment variables. For development, all of our config will be saved to a .env file. The dotenv gem will automatically load a .env file if it finds one in the root directory. Add the dotenv gem to the top of your Gemfile. Other gems will require your environment variables exist, so dotenv needs to be loaded before they are.</p>
+            <figure class="highlight">
+              <pre><code class="language-ruby" data-lang="ruby"><span class="n">gem</span> <span class="s1">'dotenv-rails'</span><span class="p">,</span> <span class="ss">group: :development</span></code></pre>
+            </figure>
+            <p>The last gem we need to add will be our JSON serializer. The best serializer for talking to EmberJS is the <a href="https://github.com/rails-api/active_model_serializers">Active Model Serializer</a> gem. The version of Active Model Serializer that best supports JSON API is still in release candidate, so we need to include a version number when we add this gem. Usually using pre-release builds is bad. The problem is that the next version of Active Model Serializer isn’t based off of the previous version, 0.9. The next release is branched off of version 0.8. It will be easier to risk using the release candidate than it would be to use the most recently released stable version and change our code later.</p>
+            <figure class="highlight">
+              <pre><code class="language-ruby" data-lang="ruby"><span class="n">gem</span> <span class="s1">'active_model_serializers'</span><span class="p">,</span> <span class="s1">'0.10.0.rc4'</span></code></pre>
+            </figure>
+            <p>Your finished Gemfile should look like this.</p>
+            <figure class="highlight">
+              <pre><code class="language-ruby" data-lang="ruby"><span class="c1"># Gemfile</span>
+<span class="n">source</span> <span class="s1">'https://rubygems.org'</span>
+
+<span class="n">ruby</span> <span class="s1">'2.3.0'</span>
+
+<span class="n">gem</span> <span class="s1">'dotenv-rails'</span><span class="p">,</span> <span class="ss">group: :development</span>
+
+<span class="n">gem</span> <span class="s1">'rails'</span><span class="p">,</span> <span class="s1">'&gt;= 5.0.0.beta2'</span><span class="p">,</span> <span class="s1">'&lt; 5.1'</span>
+<span class="n">gem</span> <span class="s1">'pg'</span>
+<span class="n">gem</span> <span class="s1">'puma'</span>
+<span class="n">gem</span> <span class="s1">'active_model_serializers'</span><span class="p">,</span> <span class="s1">'0.10.0.rc4'</span>
+
+<span class="n">group</span> <span class="ss">:development</span><span class="p">,</span> <span class="ss">:test</span> <span class="k">do</span>
+  <span class="n">gem</span> <span class="s1">'byebug'</span>
+<span class="k">end</span>
+
+<span class="n">group</span> <span class="ss">:development</span> <span class="k">do</span>
+  <span class="n">gem</span> <span class="s1">'spring'</span>
+<span class="k">end</span></code></pre>
+            </figure>
+            <p>Sometimes bundler will install gems to your home directory. I <em>hate</em> installing to my home directory. Run the following command to configure bundler to install in vendor/bundle directory inside your app.</p>
+            <figure class="highlight">
+              <pre><code class="language-shell" data-lang="shell">bundle config <span class="nt">--global</span> path vendor/bundle</code></pre>
+            </figure>
+            <p>Now run bundle install</p>
+            <figure class="highlight">
+              <pre><code class="language-shell" data-lang="shell">bundle <span class="nb">install</span></code></pre>
+            </figure>
+            <p>We removed a bunch of gems that handle our JavaScript and CSS. Open the files app/assets/application.js and app/assets/appication.css and delete everything inside them. We’ll use them later, but right now all they do is reference libraries that we’ve removed.</p>
+            <h2 id="step-4---configuring-our-shiny-new-app">Step 4 - Configuring Our Shiny New App</h2>
+            <p>Now we need to configure our Rails app to use environment variables for all of its configuration.</p>
+            <p>First we’ll update config/database.yml. We want development, test, and production to share the same basic settings. We set those in a default collection. Our development, test, and production collections will inherit from it. We want our database name to be different but similar for our development and test databases. When running tests locally, we don’t want them to overwrite or delete our development data. Change the yaml code so that it reads the database name from an environment variable called DATABASE_NAME and appends _development or _test to the end of the name.</p>
+            <p>The production database will be more complicated. The production database will need more configuration options passed to it, such as the user name, password, or connection pool size. Instead of getting the database name from an environment variable, we want to get a url to the database. We’ll go over the exact value of the url when we deploy.</p>
+            <p>The finished database.yml file will look like the one below.</p>
+            <figure class="highlight">
+              <pre><code class="language-yaml" data-lang="yaml"><span class="na">default</span><span class="pi">:</span> <span class="nl">&amp;default</span>
+  <span class="na">adapter</span><span class="pi">:</span> <span class="s">postgresql</span>
+  <span class="na">encoding</span><span class="pi">:</span> <span class="s">unicode</span>
+  <span class="na">pool</span><span class="pi">:</span> <span class="m">5</span>
+
+<span class="na">development</span><span class="pi">:</span>
+  <span class="s">&lt;&lt;</span><span class="pi">:</span> <span class="nv">*default</span>
+  <span class="na">database</span><span class="pi">:</span> <span class="s">&lt;%= ENV['DATABASE_NAME'] %&gt;_development</span>
+
+<span class="na">test</span><span class="pi">:</span>
+  <span class="s">&lt;&lt;</span><span class="pi">:</span> <span class="nv">*default</span>
+  <span class="na">database</span><span class="pi">:</span> <span class="s">&lt;%= ENV['DATABASE_NAME'] %&gt;_test</span>
+
+<span class="na">production</span><span class="pi">:</span>
+  <span class="na">url</span><span class="pi">:</span> <span class="s">&lt;%= ENV['DATABASE_URL'] %&gt;</span></code></pre>
+            </figure>
+            <p>The only other config we need to update right now is in config/secrets.yml. The secret_key_base is used to encrypt your cookies. We want to keep it secret and out of our source control. Set the secret key to be an environment variable like below.</p>
+            <figure class="highlight">
+              <pre><code class="language-yaml" data-lang="yaml"><span class="na">default</span><span class="pi">:</span> <span class="nl">&amp;default</span>
+  <span class="na">secret_key_base</span><span class="pi">:</span> <span class="s">&lt;%= ENV.fetch('SECRET_KEY_BASE') %&gt;</span>
+
+<span class="na">development</span><span class="pi">:</span>
+  <span class="s">&lt;&lt;</span><span class="pi">:</span> <span class="nv">*default</span>
+
+<span class="na">test</span><span class="pi">:</span>
+  <span class="s">&lt;&lt;</span><span class="pi">:</span> <span class="nv">*default</span>
+
+<span class="na">production</span><span class="pi">:</span>
+  <span class="s">&lt;&lt;</span><span class="pi">:</span> <span class="nv">*default</span></code></pre>
+            </figure>
+            <p>Notice how we use ENV[] to access the database environment variables and ENV.fetch to access the secret key base? ENV.fetch will throw an error if the value isn’t found. If our database environment variables are missing our rails app won’t be able to connect to the database. It will be obvious where the error is occurring. If the secret key base isn’t set, our cookies won’t be encrypted. If it’s missing we want to know immediately, so we use the ENV command that throws an error if the value is missing.</p>
+            <p>Now try running your database migrations with the command <a href="#paperbackwriter-1-aside4">bundle exec</a> rake db:migrate.</p>
+            <figure class="highlight">
+              <pre><code class="language-shell" data-lang="shell">bundle <span class="nb">exec </span>rake db:migrate</code></pre>
+            </figure>
+            <p>You should see an error similar to “rake aborted! KeyError: key not found: “SECRET_KEY_BASE””. Our environment variables aren’t declared yet. The dotenv-rails gem expects a .env file in the top level of our project. Create that file and add our environment variables and their values.</p>
+            <p>We can generate a new value for the secret key base by running rake secret. The secret will be a very very long hexadecimal string.</p>
+            <figure class="highlight">
+              <pre><code class="language-shell" data-lang="shell">bundle <span class="nb">exec </span>rake secret</code></pre>
+            </figure>
+            <p>The finished .env file should match the one below.</p>
+            <figure class="highlight">
+              <pre><code class="language-shell" data-lang="shell"><span class="c"># .env</span>
+<span class="nv">DATABASE_NAME</span><span class="o">=</span>paperbackwriter
+<span class="nv">SECRET_KEY_BASE</span><span class="o">=</span>a76efdbac8a4eccdd4c05e50da54fa99f7f16b31dd751aec26b336da34529334c57a0727118c3c82aa67a5111b87bdad24ab380f56195e37f20665ff9b298264</code></pre>
+            </figure>
+            <p>Rerun your migrations, and they should create a new development database. If you see any error messages verify that Postgres is running on your machine. If you get an error message about your database not existing run rake db:create first.</p>
+            <figure class="highlight">
+              <pre><code class="language-shell" data-lang="shell">bundle <span class="nb">exec </span>rake db:create
+bundle <span class="nb">exec </span>rake db:migrate</code></pre>
+            </figure>
+            <p>Now we’ve done everything we need to run our rails app. Run bundle exec rails s and visit <a href="http://localhost:3000">http://localhost:3000</a>.</p>
+            <figure class="highlight">
+              <pre><code class="language-shell" data-lang="shell">bundle <span class="nb">exec </span>rails s</code></pre>
+            </figure>
+            <p>You should be viewing the Rails start page. It’s pretty but boring. Next, we’ll add some data.</p>
+            <h2 id="step-5---generate-the-rails-models-and-test-seeds">Step 5 - Generate the Rails models and test seeds</h2>
+            <ul>
+              <li><a href="http://jeffthomas.xyz/many-to-many-relationships-in-rails">Has many relationships in Rails</a></li>
+            </ul>
+            <p>When I picture our blog, the main page lists articles chronologically. They are paged or infinitely scrolling. It doesn’t matter which. You should be able to read every single article by clicking the same button. Each piece should be tagged. We should be able to click on any tag and see a chronological list of all posts with that tag. We want our app to create single page and multiple page content. My idea for this is to have a model called Writing which corresponds to a post. Then each post has multiple Section models. Then if a post has more than one section it should be paginated.</p>
+            <p>Let’s start with tags and writings. Generate Tag and Writing models with the following console commands. In the commands, the g is short for generate. Generating a scaffold will create a model, controller, and the default views for index, show, edit, and new. Other options for generators include generating resources and individual models, controllers, and views.</p>
+            <figure class="highlight">
+              <pre><code class="language-shell" data-lang="shell">bundle <span class="nb">exec </span>rails g scaffold Tag name:string description:text
+
+bundle <span class="nb">exec </span>rails g scaffold Writing title:string</code></pre>
+            </figure>
+            <p>Each Writing will have many tags and each Tag will have many Writings. They won’t be dependent on each other. This is a good time to use a <a href="http://jeffthomas.xyz/many-to-many-relationships-in-rails">has many and belongs to many relationship</a>. Run the command to generate a join table migration.</p>
+            <figure class="highlight">
+              <pre><code class="language-shell" data-lang="shell">bundle <span class="nb">exec </span>rails g migration create_join_table tag writing</code></pre>
+            </figure>
+            <p>Open the migration and change it to match the below code. Rails is pretty good at guessing what you want. You should just have to uncomment the two indexes in the file.</p>
+            <figure class="highlight">
+              <pre><code class="language-ruby" data-lang="ruby"><span class="k">class</span> <span class="nc">CreateJoinTable</span> <span class="o">&lt;</span> <span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Migration</span><span class="p">[</span><span class="mf">5.0</span><span class="p">]</span>
+  <span class="k">def</span> <span class="nf">change</span>
+    <span class="n">create_join_table</span> <span class="ss">:tags</span><span class="p">,</span> <span class="ss">:writings</span> <span class="k">do</span> <span class="o">|</span><span class="n">t</span><span class="o">|</span>
+      <span class="n">t</span><span class="p">.</span><span class="nf">index</span> <span class="p">[</span><span class="ss">:tag_id</span><span class="p">,</span> <span class="ss">:writing_id</span><span class="p">]</span>
+      <span class="n">t</span><span class="p">.</span><span class="nf">index</span> <span class="p">[</span><span class="ss">:writing_id</span><span class="p">,</span> <span class="ss">:tag_id</span><span class="p">]</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+<span class="k">end</span></code></pre>
+            </figure>
+            <p>If you look inside the config/routes.rb file, Rails automatically added resources</p>
+            <figure class="highlight">
+              <pre><code class="language-ruby" data-lang="ruby">  <span class="n">resources</span> <span class="ss">:writings</span>
+  <span class="n">resources</span> <span class="ss">:tags</span></code></pre>
+            </figure>
+            <p>Open app/models/tag.rb to look at Tag model. Rails makes it super easy to add validations to your models. Add a validation to the tags to force them to have unique names.</p>
+            <figure class="highlight">
+              <pre><code class="language-ruby" data-lang="ruby"><span class="c1"># app/models/tag.rb</span>
+<span class="k">class</span> <span class="nc">Tag</span> <span class="o">&lt;</span> <span class="no">ApplicationRecord</span>
+  <span class="n">validates_uniqueness_of</span> <span class="ss">:name</span>
+<span class="k">end</span></code></pre>
+            </figure>
+            <p>Add the same validation to app/models/writing.rb for the title field.</p>
+            <figure class="highlight">
+              <pre><code class="language-ruby" data-lang="ruby"><span class="c1"># app/models/tag.rb</span>
+<span class="k">class</span> <span class="nc">Writing</span> <span class="o">&lt;</span> <span class="no">ApplicationRecord</span>
+  <span class="n">validates_presence_of</span> <span class="ss">:title</span>
+<span class="k">end</span></code></pre>
+            </figure>
+            <p>Now let’s add the Section model. Sections are going to be the pages to our posts. They’re going to need a title, which will be optional, and they’re going to need the text for the post. Adding writing:references to the end will create a beongs_to relationship. Rails generators are pretty awesome.</p>
+            <figure class="highlight">
+              <pre><code class="language-shell" data-lang="shell">bundle <span class="nb">exec </span>rails g scaffold Section title:string text:text writing:references</code></pre>
+            </figure>
+            <p>Reciprocate the relationship by adding has_many :sections to app/models/writing.rb</p>
+            <figure class="highlight">
+              <pre><code class="language-ruby" data-lang="ruby"><span class="c1"># app/models/writing.rb</span>
+<span class="k">class</span> <span class="nc">Writing</span> <span class="o">&lt;</span> <span class="no">ApplicationRecord</span>
+  <span class="n">validates_presence_of</span> <span class="ss">:title</span>
+
+  <span class="n">has_many</span> <span class="ss">:sections</span>
+<span class="k">end</span></code></pre>
+            </figure>
+            <p>We will never want a section without the writing associated with it. Update the routes to add sections as a subroute of writings</p>
+            <figure class="highlight">
+              <pre><code class="language-ruby" data-lang="ruby"><span class="c1"># config/routes.rb</span>
+<span class="n">resources</span> <span class="ss">:writings</span> <span class="k">do</span>
+  <span class="n">resources</span> <span class="ss">:sections</span>
+<span class="k">end</span></code></pre>
+            </figure>
+            <p>Sections won’t ever exist without a Writing. Update the create method on the sections controller to always look for a Writing id and associate the section with it.</p>
+            <figure class="highlight">
+              <pre><code class="language-ruby" data-lang="ruby"><span class="c1"># app/controllers/sections_controllers</span>
+<span class="k">class</span> <span class="nc">SectionsController</span> <span class="o">&lt;</span> <span class="no">ApplicationController</span>
+<span class="c1"># ...</span>
+  <span class="k">def</span> <span class="nf">create</span>
+    <span class="vi">@writing</span> <span class="o">=</span> <span class="no">Writing</span><span class="p">.</span><span class="nf">find</span><span class="p">(</span><span class="n">params</span><span class="p">[</span><span class="ss">:writing_id</span><span class="p">])</span>
+    <span class="vi">@section</span> <span class="o">=</span> <span class="vi">@writing</span><span class="p">.</span><span class="nf">sections</span><span class="p">.</span><span class="nf">create</span><span class="p">(</span><span class="n">section_params</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="vi">@section</span><span class="p">.</span><span class="nf">save</span>
+      <span class="n">redirect_to</span> <span class="vi">@section</span><span class="p">,</span> <span class="ss">notice: </span><span class="s1">'Section was successfully created.'</span>
+    <span class="k">else</span>
+      <span class="n">render</span> <span class="ss">:new</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+<span class="c1"># ...</span>
+<span class="k">end</span></code></pre>
+            </figure>
+            <p>We just want rails to act as an API server right now. It will talk to our Ember admin page to create new writings and sections. The views for writings, tags, and sections exist now, but we’re going to remove them. We’ll add the views later.</p>
+            <p>Open the controllers for writings. The index view is creating a class variable for all writings. It looks like @writings = Writing.all. At the end of the index and show methods add code to render @writings as json. It will look like this.</p>
+            <figure class="highlight">
+              <pre><code class="language-ruby" data-lang="ruby"><span class="c1"># app/controllers/writings_controller.rb</span>
+<span class="k">class</span> <span class="nc">WritingsController</span> <span class="o">&lt;</span> <span class="no">ApplicationController</span>
+  <span class="n">before_action</span> <span class="ss">:set_writing</span><span class="p">,</span> <span class="ss">only: </span><span class="p">[</span><span class="ss">:show</span><span class="p">,</span> <span class="ss">:edit</span><span class="p">,</span> <span class="ss">:update</span><span class="p">,</span> <span class="ss">:destroy</span><span class="p">]</span>
+
+  <span class="c1"># GET /writings</span>
+  <span class="k">def</span> <span class="nf">index</span>
+    <span class="vi">@writings</span> <span class="o">=</span> <span class="no">Writing</span><span class="p">.</span><span class="nf">all</span>
+
+    <span class="n">render</span> <span class="ss">json: </span><span class="vi">@writings</span>
+  <span class="k">end</span>
+
+  <span class="c1"># GET /writings/1</span>
+  <span class="k">def</span> <span class="nf">show</span>
+    <span class="n">render</span> <span class="ss">json: </span><span class="vi">@writing</span>
+  <span class="k">end</span>
+<span class="c1"># ...</span>
+<span class="k">end</span></code></pre>
+            </figure>
+            <p>Do the same for Tags and Sections</p>
+            <figure class="highlight">
+              <pre><code class="language-ruby" data-lang="ruby"><span class="c1"># app/controllers/tags_controller.rb</span>
+<span class="k">class</span> <span class="nc">TagsController</span> <span class="o">&lt;</span> <span class="no">ApplicationController</span>
+  <span class="n">before_action</span> <span class="ss">:set_tag</span><span class="p">,</span> <span class="ss">only: </span><span class="p">[</span><span class="ss">:show</span><span class="p">,</span> <span class="ss">:edit</span><span class="p">,</span> <span class="ss">:update</span><span class="p">,</span> <span class="ss">:destroy</span><span class="p">]</span>
+
+  <span class="c1"># GET /tags</span>
+  <span class="k">def</span> <span class="nf">index</span>
+    <span class="vi">@tags</span> <span class="o">=</span> <span class="no">Tag</span><span class="p">.</span><span class="nf">all</span>
+
+    <span class="n">render</span> <span class="ss">json: </span><span class="vi">@tags</span>
+  <span class="k">end</span>
+
+  <span class="c1"># GET /tags/1</span>
+  <span class="k">def</span> <span class="nf">show</span>
+    <span class="n">render</span> <span class="ss">json: </span><span class="vi">@tag</span>
+  <span class="k">end</span>
+<span class="c1"># ...</span>
+<span class="k">end</span></code></pre>
+            </figure>
+            <figure class="highlight">
+              <pre><code class="language-ruby" data-lang="ruby"><span class="c1"># app/controllers/sections_controller.rb</span>
+<span class="k">class</span> <span class="nc">SectionsController</span> <span class="o">&lt;</span> <span class="no">ApplicationController</span>
+  <span class="n">before_action</span> <span class="ss">:set_section</span><span class="p">,</span> <span class="ss">only: </span><span class="p">[</span><span class="ss">:show</span><span class="p">,</span> <span class="ss">:edit</span><span class="p">,</span> <span class="ss">:update</span><span class="p">,</span> <span class="ss">:destroy</span><span class="p">]</span>
+
+  <span class="c1"># GET /sections</span>
+  <span class="k">def</span> <span class="nf">index</span>
+    <span class="vi">@sections</span> <span class="o">=</span> <span class="no">Section</span><span class="p">.</span><span class="nf">all</span>
+
+    <span class="n">render</span> <span class="ss">json: </span><span class="vi">@sections</span>
+  <span class="k">end</span>
+
+  <span class="c1"># GET /sections/1</span>
+  <span class="k">def</span> <span class="nf">show</span>
+    <span class="n">render</span> <span class="ss">json: </span><span class="vi">@section</span>
+  <span class="k">end</span>
+<span class="c1"># ...</span>
+<span class="k">end</span></code></pre>
+            </figure>
+            <p>Everything should be created and working. Let’s seed our database with test data so we can verify the routes work. Open seeds.rb and add the following code. This will create several tags, one writing, and three sections to that writing.</p>
+            <figure class="highlight">
+              <pre><code class="language-ruby" data-lang="ruby"><span class="c1"># db/seeds.rb</span>
+<span class="no">Tag</span><span class="p">.</span><span class="nf">create</span><span class="p">([{</span><span class="ss">name: </span><span class="s1">'Book'</span><span class="p">,</span> <span class="ss">description: </span><span class="s1">'A long form piece with many sections'</span><span class="p">},</span> <span class="p">{</span><span class="ss">name: </span><span class="s1">'Blog'</span><span class="p">,</span> <span class="ss">description: </span><span class="s1">'A writing part of a date series'</span><span class="p">},</span> <span class="p">{</span><span class="ss">name: </span><span class="s1">'Review'</span><span class="p">,</span> <span class="ss">description: </span><span class="s1">'Standalone reviews of things'</span><span class="p">}])</span>
+
+<span class="n">writing1</span> <span class="o">=</span> <span class="no">Writing</span><span class="p">.</span><span class="nf">create</span><span class="p">(</span><span class="ss">title: </span><span class="s1">'The first frost of spring'</span><span class="p">)</span>
+
+<span class="n">sonnet5</span> <span class="o">=</span> <span class="s2">"""Those hours that with gentle work did frame
+The lovely gaze where every eye doth dwell
+Will play the tyrants to the very same,
+And that unfair which fairly doth excel:
+For never-resting time leads summer on
+To hideous winter and confounds him there,
+Sap checked with frost and lusty leaves quite gone,
+Beauty o'er-snowed and bareness every where:
+Then were not summer's distillation left
+A liquid prisoner pent in walls of glass,
+Beauty's effect with beauty were bereft,
+Nor it nor no remembrance what it was.
+  But flowers distilled though they with winter meet,
+  Leese but their show, their substance still lives sweet."""</span>
+
+<span class="n">sonnet64</span> <span class="o">=</span> <span class="s2">"""When I have seen by Time's fell hand defaced
+The rich-proud cost of outworn buried age,
+When sometime lofty towers I see down-rased,
+And brass eternal slave to mortal rage.
+When I have seen the hungry ocean gain
+Advantage on the kingdom of the shore,
+And the firm soil win of the watery main,
+Increasing store with loss, and loss with store.
+When I have seen such interchange of State,
+Or state it self confounded, to decay,
+Ruin hath taught me thus to ruminate
+That Time will come and take my love away.
+  This thought is as a death which cannot choose
+  But weep to have, that which it fears to lose."""</span>
+
+<span class="n">sonnet144</span> <span class="o">=</span> <span class="s2">"""Two loves I have of comfort and despair,
+Which like two spirits do suggest me still,
+The better angel is a man right fair:
+The worser spirit a woman coloured ill.
+To win me soon to hell my female evil,
+Tempteth my better angel from my side,
+And would corrupt my saint to be a devil:
+Wooing his purity with her foul pride.
+And whether that my angel be turned fiend,
+Suspect I may, yet not directly tell,
+But being both from me both to each friend,
+I guess one angel in another's hell.
+  Yet this shall I ne'er know but live in doubt,
+  Till my bad angel fire my good one out."""</span>
+
+<span class="no">Section</span><span class="p">.</span><span class="nf">create</span><span class="p">(</span><span class="ss">text: </span><span class="n">sonnet5</span><span class="p">,</span> <span class="ss">writing: </span><span class="n">writing1</span><span class="p">)</span>
+<span class="no">Section</span><span class="p">.</span><span class="nf">create</span><span class="p">(</span><span class="ss">text: </span><span class="n">sonnet64</span><span class="p">,</span> <span class="ss">writing: </span><span class="n">writing1</span><span class="p">)</span>
+<span class="no">Section</span><span class="p">.</span><span class="nf">create</span><span class="p">(</span><span class="ss">text: </span><span class="n">sonnet144</span><span class="p">,</span> <span class="ss">writing: </span><span class="n">writing1</span><span class="p">)</span></code></pre>
+            </figure>
+            <p>Run bundle exec rake db:seed to execute your seed.rb file. This will fill the database with the data we just specified.</p>
+            <figure class="highlight">
+              <pre><code class="language-ruby" data-lang="ruby"><span class="n">bundle</span> <span class="nb">exec</span> <span class="n">rake</span> <span class="n">db</span><span class="ss">:seed</span></code></pre>
+            </figure>
+            <p>If your app isn’t already running, run bundle exec rails s</p>
+            <figure class="highlight">
+              <pre><code class="language-shell" data-lang="shell">bundle <span class="nb">exec </span>rails s</code></pre>
+            </figure>
+            <p>Visit <a href="http://localhost:3000/writings">http://localhost:3000/writings</a> and you can see the writings object we created. Also checkout <a href="http://localhost:3000/tags">http://localhost:3000/tags</a>. Sections are trickier. We added them as a sub route of writings. Visit <a href="http://localhost:3000/writings/1/sections">http://localhost:3000/writings/1/sections</a> to view the sections we created for the writing with id 1.</p>
+            <h2 id="next">Next</h2>
+            <p>In the next post we will add an admin screen using Ember.</p>
+            <p>If you haven’t committed your code to a <a href="#paperbackwriter-1-aside5">git repository now is a good time.</a></p>
+            <h2 id="asides">Asides</h2>
+            <ol>
+              <li id="paperbackwriter-1-aside1">The older I get the more documentation matters. This means meaningful examples that explain how you should code. Scala is an alright language, but its documentation is horrible. You need to spend as much time learning its build tool, sbt, as you do a programming language. Why isn't the JavaScript from my asset pipeline accessible to the test code? Because sbt is concurrent and you need to add a dependency. What's the command you need to type to add a test dependency? Use auto complete to start guessing. It's way faster to guess random words than to google what the right name for the asset pipeline's package. Speaking of the asset pipeline, you have to read the source code to find what options are available. Beginners to your language shouldn't have to read the source code. Ugh, I will never choose Scala. Fuck Scala.</li>
+              <li id="paperbackwriter-1-aside2">Larry Ellison always gets his paycheck. I try to avoid any technologies within his domain.</li>
+              <li id="paperbackwriter-1-aside3">Our app is supposed to be a replacement for WordPress. It needs to run cheaply because it's not going to make us ANY ad revenue unless we're secretly Cory Doctorow. Our blog is for fun. If this was an app that was making a profit, we would just throw money at the problem. Nothing speeds up a database like renting a dedicated virtual server for it or paying for a larger RDS instance if we're hosting it in Amazon. If you need even more scale and have the money you can buy actual, physical servers. You need millions of users to overpower a DL580.</li>
+              <li id="paperbackwriter-1-aside4">I always prepend rake commands with bundle exec. With bundle exec, bundler will use your Gemfile's installed gems with the command. Very rarely you can have globally installed gems conflict with the ones your app needs</li>
+              <li id="paperbackwriter-1-aside5">When you add your app to a git repository you'll need to add a .gitignore file. Github has a good <a href="https://github.com/github/gitignore/blob/master/Rails.gitignore">template that you can use.</a> Github appears to use Pow instead of Dotenv. Add .env to your .gitignore file, so your secrets aren't stored in your source code</li>
+            </ol>
+          </div>
+          <a class="u-url" href="/2016/02/07/creating-a-word-press-clone-1.html" hidden></a>
+        </article>
+      </div>
+    </main>
+  </body>
+</html>
