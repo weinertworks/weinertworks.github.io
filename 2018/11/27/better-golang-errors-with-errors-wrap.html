@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="initial-scale=1, viewport-fit=cover">
+    <meta name="google-site-verification" content="w449-YRInXMviD2YBTfFdb9hs54JylYloEurwuY9-nQ" />
+    <link rel="stylesheet" href="/assets/main.css"><!-- Begin Jekyll SEO tag v2.7.1 -->
+    <title>Better Golang Errors With errors.Wrap | Weinert Works</title>
+    <meta name="generator" content="Jekyll v4.2.1" />
+    <meta property="og:title" content="Better Golang Errors With errors.Wrap" />
+    <meta name="author" content="Jim" />
+    <meta property="og:locale" content="en_US" />
+    <meta name="description" content="Libraries shouldn’t log. Logging takes resources and should occur as rarely as possible. If an error occurs deep in your program, you don’t want to immediately log it, bubble the error up the stack, and then log the same error again but with additional context. Thus, you should try to log as close to the UI as possible. If you’re writing a web service, only log in the handler before you send a response. The code for accessing the database is a dependency and should be in its own package. We treat it like a library and only concern ourselves with its API." />
+    <meta property="og:description" content="Libraries shouldn’t log. Logging takes resources and should occur as rarely as possible. If an error occurs deep in your program, you don’t want to immediately log it, bubble the error up the stack, and then log the same error again but with additional context. Thus, you should try to log as close to the UI as possible. If you’re writing a web service, only log in the handler before you send a response. The code for accessing the database is a dependency and should be in its own package. We treat it like a library and only concern ourselves with its API." />
+    <link rel="canonical" href="https://www.weinertworks.com/2018/11/27/better-golang-errors-with-errors-wrap.html" />
+    <meta property="og:url" content="https://www.weinertworks.com/2018/11/27/better-golang-errors-with-errors-wrap.html" />
+    <meta property="og:site_name" content="Weinert Works" />
+    <meta property="og:type" content="article" />
+    <meta property="article:published_time" content="2018-11-27T23:13:59-06:00" />
+    <meta name="twitter:card" content="summary" />
+    <meta property="twitter:title" content="Better Golang Errors With errors.Wrap" />
+    <script type="application/ld+json">
+      {"headline":"Better Golang Errors With errors.Wrap","dateModified":"2018-11-27T23:13:59-06:00","datePublished":"2018-11-27T23:13:59-06:00","url":"https://www.weinertworks.com/2018/11/27/better-golang-errors-with-errors-wrap.html","mainEntityOfPage":{"@type":"WebPage","@id":"https://www.weinertworks.com/2018/11/27/better-golang-errors-with-errors-wrap.html"},"author":{"@type":"Person","name":"Jim"},"@type":"BlogPosting","description":"Libraries shouldn’t log. Logging takes resources and should occur as rarely as possible. If an error occurs deep in your program, you don’t want to immediately log it, bubble the error up the stack, and then log the same error again but with additional context. Thus, you should try to log as close to the UI as possible. If you’re writing a web service, only log in the handler before you send a response. The code for accessing the database is a dependency and should be in its own package. We treat it like a library and only concern ourselves with its API.","@context":"https://schema.org"}
+    </script>
+    <!-- End Jekyll SEO tag -->
+    <link type="application/atom+xml" rel="alternate" href="https://www.weinertworks.com/feed.xml" title="Weinert Works" /></head>
+  <body>
+    <header class="site-header">
+      <div class="container">
+        <a class="site-title" href="/">Weinert Works</a>
+        <nav class="site-nav">
+          <ul>
+            <li><a class="page-link" href="/">Blog</a></li>
+            <li><a class="page-link" href="/feed.xml">RSS</a></li>
+          </ul>
+        </nav>
+      </div>
+    </header>
+    <main class="page-content container" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+          <header class="post-header">
+            <h1 class="post-title p-name" itemprop="name headline">Better Golang Errors With errors.Wrap</h1>
+            <p class="post-meta">
+              <time class="dt-published" datetime="2018-11-27T23:13:59-06:00" itemprop="datePublished">
+                Nov 27, 2018
+              </time>• <span itemprop="author" itemscope itemtype="http://schema.org/Person"><span class="p-author h-card" itemprop="name">Jim</span></span></p>
+          </header>
+          <div class="post-content e-content" itemprop="articleBody">
+            <p><a href="#bgewe-aside1">Libraries shouldn’t log</a>. Logging takes resources and should occur as rarely as possible. If an error occurs deep in your program, you don’t want to immediately log it, bubble the error up the stack, and then log the same error again but with additional context. Thus, you should try to log as close to the UI as possible. If you’re writing a web service, only log in the handler before you send a response. The code for accessing the database is a dependency and should be in its own package. We treat it like a library and only concern ourselves with its API.</p>
+            <p>But… having more context would be helpful. Even though it’s wasteful, logging an error twice reveals more about the current code path when the bug occurred.</p>
+            <p>One way to provide more context is to have very specific messages for each log line that are never repeated. For example…</p>
+            <figure class="highlight">
+              <pre><code class="language-go" data-lang="go"><span class="k">const</span> <span class="p">(</span>
+  <span class="n">UnauthorizedUserLogMsg</span>                <span class="kt">string</span> <span class="o">=</span> <span class="s">"Unauthorized request"</span>
+  <span class="n">UnmarshallingRequestErrorLogMsg</span>       <span class="kt">string</span> <span class="o">=</span> <span class="s">"Error unmarshalling request body"</span>
+  <span class="n">JSONMarshallingResponseErrorLogMsg</span>    <span class="kt">string</span> <span class="o">=</span> <span class="s">"Error marshalling json response body"</span>
+  <span class="n">JSONAPIMarshallingResponseErrorLogMsg</span> <span class="kt">string</span> <span class="o">=</span> <span class="s">"Error marshalling jsonapi response body"</span>
+  <span class="n">DatastoreErrorLogMsg</span>                  <span class="kt">string</span> <span class="o">=</span> <span class="s">"Error returned by the datastore"</span>
+<span class="p">)</span>
+
+<span class="k">func</span> <span class="p">(</span><span class="n">handler</span> <span class="o">*</span><span class="n">Handler</span><span class="p">)</span> <span class="n">CompaniesGetAll</span><span class="p">(</span><span class="n">resp</span> <span class="n">http</span><span class="o">.</span><span class="n">ResponseWriter</span><span class="p">,</span> <span class="n">req</span> <span class="o">*</span><span class="n">http</span><span class="o">.</span><span class="n">Request</span><span class="p">)</span> <span class="p">{</span>
+  <span class="n">companies</span><span class="p">,</span> <span class="n">err</span> <span class="o">:=</span> <span class="n">handler</span><span class="o">.</span><span class="n">Datastore</span><span class="o">.</span><span class="n">CompaniesGetAll</span><span class="p">(</span><span class="n">limit</span><span class="p">,</span> <span class="n">offset</span><span class="p">)</span>
+  <span class="k">if</span> <span class="n">err</span> <span class="o">!=</span> <span class="no">nil</span> <span class="p">{</span>
+    <span class="n">handler</span><span class="o">.</span><span class="n">Logger</span><span class="o">.</span><span class="n">Error</span><span class="p">()</span><span class="o">.</span><span class="n">Err</span><span class="p">(</span><span class="n">err</span><span class="p">)</span><span class="o">.</span><span class="n">Msg</span><span class="p">(</span><span class="n">DatastoreErrorLogMsg</span><span class="p">)</span>
+    <span class="n">http</span><span class="o">.</span><span class="n">Error</span><span class="p">(</span><span class="n">rw</span><span class="p">,</span> <span class="s">"Internal Server Error"</span><span class="p">,</span> <span class="n">http</span><span class="o">.</span><span class="n">StatusInternalServerError</span><span class="p">)</span>
+    <span class="k">return</span>
+  <span class="p">}</span>
+
+  <span class="c">// Handle a normal response</span>
+  <span class="c">// ...</span>
+<span class="p">}</span></code></pre>
+            </figure>
+            <p>If the Datastore package is returning a Postgresql error, that error could have come from any request to the database in CompaniesGetAll, and the error messages from the Go Postgresql adapter are especially obscure.</p>
+            <p>Enter <a href="https://github.com/pkg/errors">github.com/pkg/errors</a>, a package that lets you wrap your errors with additional context. Calling errors.Wrap(err, message) returns a struct that conforms to the errors interface where message is prepended to the error. Everytime an error is returned, you can add context to that error message.</p>
+            <p>My preferred way to use errors.Wrap is to keep it concise. The message added should have the format “verbing noun”.</p>
+            <figure class="highlight">
+              <pre><code class="language-go" data-lang="go"><span class="k">var</span> <span class="n">count</span> <span class="kt">int</span>
+<span class="n">err</span> <span class="o">:=</span> <span class="n">db</span><span class="o">.</span><span class="n">DB</span><span class="o">.</span><span class="n">QueryRow</span><span class="p">(</span><span class="s">"SELECT COUNT(*) FROM companies;"</span><span class="p">)</span><span class="o">.</span><span class="n">Scan</span><span class="p">(</span><span class="o">&amp;</span><span class="n">count</span><span class="p">)</span>
+<span class="k">if</span> <span class="n">err</span> <span class="o">!=</span> <span class="no">nil</span> <span class="p">{</span>
+  <span class="k">return</span> <span class="m">0</span><span class="p">,</span> <span class="n">errors</span><span class="o">.</span><span class="n">Wrap</span><span class="p">(</span><span class="n">err</span><span class="p">,</span> <span class="s">"querying company count"</span><span class="p">)</span>
+<span class="p">}</span></code></pre>
+            </figure>
+            <p>Now your errors have more context AND you are not logging in your packages.</p>
+            <ol>
+              <li id="bgewe-aside1">I will allow an exception for packages that start their go routines that run alongside your app. If your package <i>needs</i> to log information, please please please let the user pass in an <a href="#bgewe-aside2">io.Writer</a>. Most loggers support the io.Writer interface, so your user's can use their logging library and format. If your logger writes JSON and you use <a href="https://github.com/DataDog/dd-trace-go">Datadog's tracer</a>, error messages from Datadog aren't going to match your pretty formatted logs</li>
+              <li id="bgewe-aside2">I wish there was a standard interface for logging that gave you log levels.</li>
+              <li>Secret trick: if your apps performance is degrading, disable logging. <a href="https://youtu.be/Xyk99kXFHX4">Verizon disables logging</a> when new iPhones launch to prevent themselves from being DDoS'd by thirsty Apple users.</li>
+              <li><a href="https://github.com/rs/zerolog">Zerolog</a>, my logger of choice, lets you use <a href="https://github.com/cloudfoundry/go-diodes">Diodes</a>, a ring buffer, for writing logs. If logs are written to Diodes faster than stdout can read them, logs get dropped until stdout catches up.</li>
+            </ol>
+          </div>
+          <a class="u-url" href="/2018/11/27/better-golang-errors-with-errors-wrap.html" hidden></a>
+        </article>
+      </div>
+    </main>
+  </body>
+</html>

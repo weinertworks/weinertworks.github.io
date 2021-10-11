@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="initial-scale=1, viewport-fit=cover">
+    <meta name="google-site-verification" content="w449-YRInXMviD2YBTfFdb9hs54JylYloEurwuY9-nQ" />
+    <link rel="stylesheet" href="/assets/main.css"><!-- Begin Jekyll SEO tag v2.7.1 -->
+    <title>Fixing a Postgres Type Casting Bug With Regex | Weinert Works</title>
+    <meta name="generator" content="Jekyll v4.2.1" />
+    <meta property="og:title" content="Fixing a Postgres Type Casting Bug With Regex" />
+    <meta name="author" content="Jim" />
+    <meta property="og:locale" content="en_US" />
+    <meta name="description" content="Today I learned how to fix a type casting bug in our Postgresql script with regular expressions. This deserves celebration! Details below." />
+    <meta property="og:description" content="Today I learned how to fix a type casting bug in our Postgresql script with regular expressions. This deserves celebration! Details below." />
+    <link rel="canonical" href="https://www.weinertworks.com/2018/06/08/fixing-a-postgres-type-casting-bug-with-regex.html" />
+    <meta property="og:url" content="https://www.weinertworks.com/2018/06/08/fixing-a-postgres-type-casting-bug-with-regex.html" />
+    <meta property="og:site_name" content="Weinert Works" />
+    <meta property="og:type" content="article" />
+    <meta property="article:published_time" content="2018-06-08T00:00:00-05:00" />
+    <meta name="twitter:card" content="summary" />
+    <meta property="twitter:title" content="Fixing a Postgres Type Casting Bug With Regex" />
+    <script type="application/ld+json">
+      {"headline":"Fixing a Postgres Type Casting Bug With Regex","dateModified":"2018-06-08T00:00:00-05:00","datePublished":"2018-06-08T00:00:00-05:00","url":"https://www.weinertworks.com/2018/06/08/fixing-a-postgres-type-casting-bug-with-regex.html","mainEntityOfPage":{"@type":"WebPage","@id":"https://www.weinertworks.com/2018/06/08/fixing-a-postgres-type-casting-bug-with-regex.html"},"author":{"@type":"Person","name":"Jim"},"@type":"BlogPosting","description":"Today I learned how to fix a type casting bug in our Postgresql script with regular expressions. This deserves celebration! Details below.","@context":"https://schema.org"}
+    </script>
+    <!-- End Jekyll SEO tag -->
+    <link type="application/atom+xml" rel="alternate" href="https://www.weinertworks.com/feed.xml" title="Weinert Works" /></head>
+  <body>
+    <header class="site-header">
+      <div class="container">
+        <a class="site-title" href="/">Weinert Works</a>
+        <nav class="site-nav">
+          <ul>
+            <li><a class="page-link" href="/">Blog</a></li>
+            <li><a class="page-link" href="/feed.xml">RSS</a></li>
+          </ul>
+        </nav>
+      </div>
+    </header>
+    <main class="page-content container" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+          <header class="post-header">
+            <h1 class="post-title p-name" itemprop="name headline">Fixing a Postgres Type Casting Bug With Regex</h1>
+            <p class="post-meta">
+              <time class="dt-published" datetime="2018-06-08T00:00:00-05:00" itemprop="datePublished">
+                Jun 8, 2018
+              </time>• <span itemprop="author" itemscope itemtype="http://schema.org/Person"><span class="p-author h-card" itemprop="name">Jim</span></span></p>
+          </header>
+          <div class="post-content e-content" itemprop="articleBody">
+            <p>Today I learned how to fix a type casting bug in our Postgresql script with regular expressions. This deserves celebration! Details below.</p>
+            <h2 id="the-problem">The Problem</h2>
+            <p>We have a database table that matches data to other tables based on a specific column. The values for the column are provided by the user and stored as strings. Depending on the table being matched, the values can be strings or numbers. If the user submitted bad input for a number match, accidentally including characters in their match column, the query fails.</p>
+            <p>The code handling the input was exactly the same for every match column type. I didn’t want to add a special case for this. The problem was in the query, so the fix should be in the query.</p>
+            <h2 id="the-solution">The Solution</h2>
+            <p>Update: I subscribe to Andy Croll’s Ruby newsletter. He <a href="https://andycroll.com/ruby/beginning-and-end-of-string-in-regex/">suggests using \A and \Z</a> to match the beginning and ends of a string because ^ and $ will match the ends of a line. If your string has newlines in it, it will be accepted by the regex.</p>
+            <p>Postgres has <a href="https://www.postgresql.org/docs/10/static/functions-matching.html#FUNCTIONS-POSIX-TABLE">regular expression match operators</a>. We can update our query to check that a value is a number.</p>
+            <figure class="highlight">
+              <pre><code class="language-sql" data-lang="sql"><span class="c1">-- Example query</span>
+<span class="k">SELECT</span> <span class="o">*</span>
+  <span class="k">FROM</span> <span class="n">list_of_things</span> <span class="n">lot</span>
+  <span class="k">WHERE</span> <span class="n">lot</span><span class="p">.</span><span class="n">value</span> <span class="o">~</span> <span class="s1">'^[0-9]+$'</span> <span class="k">AND</span> <span class="n">lot</span><span class="p">.</span><span class="n">value</span><span class="p">::</span><span class="nb">BIGINT</span> <span class="o">=</span> <span class="mi">12002</span><span class="p">;</span></code></pre>
+            </figure>
+            <p>The ^ operator matches the regular expression to the start of the string and the $ matches to the end. By combining them with [0-9]+ we check that every character in the string is a digit.</p>
+          </div>
+          <a class="u-url" href="/2018/06/08/fixing-a-postgres-type-casting-bug-with-regex.html" hidden></a>
+        </article>
+      </div>
+    </main>
+  </body>
+</html>

@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="initial-scale=1, viewport-fit=cover">
+    <meta name="google-site-verification" content="w449-YRInXMviD2YBTfFdb9hs54JylYloEurwuY9-nQ" />
+    <link rel="stylesheet" href="/assets/main.css"><!-- Begin Jekyll SEO tag v2.7.1 -->
+    <title>Use Pointers in Golang Arrays | Weinert Works</title>
+    <meta name="generator" content="Jekyll v4.2.1" />
+    <meta property="og:title" content="Use Pointers in Golang Arrays" />
+    <meta name="author" content="Jim" />
+    <meta property="og:locale" content="en_US" />
+    <meta name="description" content="In Go when I have an array, or slice, of structs, I prefer to always make that an array of pointers to the structs. You might want to do this so you’re not copying the entire struct every time you append to the slice. Using pointers is nanoseconds faster, but the real reason is developer ergonomics! It’s cumbersome to make changes to an array of structs." />
+    <meta property="og:description" content="In Go when I have an array, or slice, of structs, I prefer to always make that an array of pointers to the structs. You might want to do this so you’re not copying the entire struct every time you append to the slice. Using pointers is nanoseconds faster, but the real reason is developer ergonomics! It’s cumbersome to make changes to an array of structs." />
+    <link rel="canonical" href="https://www.weinertworks.com/2018/12/31/golang-use-pointers-in-slices.html" />
+    <meta property="og:url" content="https://www.weinertworks.com/2018/12/31/golang-use-pointers-in-slices.html" />
+    <meta property="og:site_name" content="Weinert Works" />
+    <meta property="og:type" content="article" />
+    <meta property="article:published_time" content="2018-12-31T00:59:17-06:00" />
+    <meta name="twitter:card" content="summary" />
+    <meta property="twitter:title" content="Use Pointers in Golang Arrays" />
+    <script type="application/ld+json">
+      {"headline":"Use Pointers in Golang Arrays","dateModified":"2018-12-31T00:59:17-06:00","datePublished":"2018-12-31T00:59:17-06:00","url":"https://www.weinertworks.com/2018/12/31/golang-use-pointers-in-slices.html","mainEntityOfPage":{"@type":"WebPage","@id":"https://www.weinertworks.com/2018/12/31/golang-use-pointers-in-slices.html"},"author":{"@type":"Person","name":"Jim"},"@type":"BlogPosting","description":"In Go when I have an array, or slice, of structs, I prefer to always make that an array of pointers to the structs. You might want to do this so you’re not copying the entire struct every time you append to the slice. Using pointers is nanoseconds faster, but the real reason is developer ergonomics! It’s cumbersome to make changes to an array of structs.","@context":"https://schema.org"}
+    </script>
+    <!-- End Jekyll SEO tag -->
+    <link type="application/atom+xml" rel="alternate" href="https://www.weinertworks.com/feed.xml" title="Weinert Works" /></head>
+  <body>
+    <header class="site-header">
+      <div class="container">
+        <a class="site-title" href="/">Weinert Works</a>
+        <nav class="site-nav">
+          <ul>
+            <li><a class="page-link" href="/">Blog</a></li>
+            <li><a class="page-link" href="/feed.xml">RSS</a></li>
+          </ul>
+        </nav>
+      </div>
+    </header>
+    <main class="page-content container" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+          <header class="post-header">
+            <h1 class="post-title p-name" itemprop="name headline">Use Pointers in Golang Arrays</h1>
+            <p class="post-meta">
+              <time class="dt-published" datetime="2018-12-31T00:59:17-06:00" itemprop="datePublished">
+                Dec 31, 2018
+              </time>• <span itemprop="author" itemscope itemtype="http://schema.org/Person"><span class="p-author h-card" itemprop="name">Jim</span></span></p>
+          </header>
+          <div class="post-content e-content" itemprop="articleBody">
+            <p>In Go when I have an array, or slice, of structs, I prefer to always make that an array of pointers to the structs. You might want to do this so you’re not copying the entire struct every time you append to the slice. Using pointers is nanoseconds faster, but the real reason is developer ergonomics! It’s cumbersome to make changes to an array of structs.</p>
+            <p>For example if you have the following struct.</p>
+            <figure class="highlight">
+              <pre><code class="language-go" data-lang="go"><span class="k">type</span> <span class="n">Object</span> <span class="k">struct</span> <span class="p">{</span>
+	<span class="n">Value</span> <span class="kt">int</span>
+<span class="p">}</span>
+
+<span class="k">func</span> <span class="p">(</span><span class="n">o</span> <span class="o">*</span><span class="n">Object</span><span class="p">)</span> <span class="n">Double</span><span class="p">()</span> <span class="p">{</span>
+	<span class="n">o</span><span class="o">.</span><span class="n">Value</span> <span class="o">*=</span> <span class="m">2</span>
+<span class="p">}</span>
+
+<span class="k">func</span> <span class="p">(</span><span class="n">o</span> <span class="o">*</span><span class="n">Object</span><span class="p">)</span> <span class="n">String</span><span class="p">()</span> <span class="kt">string</span> <span class="p">{</span>
+	<span class="k">return</span> <span class="n">fmt</span><span class="o">.</span><span class="n">Sprintf</span><span class="p">(</span><span class="s">"{%d}"</span><span class="p">,</span> <span class="n">o</span><span class="o">.</span><span class="n">Value</span><span class="p">)</span>
+<span class="p">}</span></code></pre>
+            </figure>
+            <p>If you want to change the value of the contents of the array, you would instinctively write something like this.</p>
+            <figure class="highlight">
+              <pre><code class="language-go" data-lang="go"><span class="k">package</span> <span class="n">main</span>
+
+<span class="k">import</span> <span class="p">(</span>
+	<span class="s">"fmt"</span>
+<span class="p">)</span>
+
+<span class="k">func</span> <span class="n">main</span><span class="p">()</span> <span class="p">{</span>
+	<span class="n">array</span> <span class="o">:=</span> <span class="p">[]</span><span class="n">Object</span><span class="p">{</span>
+		<span class="n">Object</span><span class="p">{</span>
+			<span class="n">Value</span><span class="o">:</span> <span class="m">0</span><span class="p">,</span>
+		<span class="p">},</span>
+		<span class="n">Object</span><span class="p">{</span>
+			<span class="n">Value</span><span class="o">:</span> <span class="m">1</span><span class="p">,</span>
+		<span class="p">},</span>
+		<span class="n">Object</span><span class="p">{</span>
+			<span class="n">Value</span><span class="o">:</span> <span class="m">2</span><span class="p">,</span>
+		<span class="p">},</span>
+	<span class="p">}</span>
+
+	<span class="n">fmt</span><span class="o">.</span><span class="n">Println</span><span class="p">(</span><span class="n">array</span><span class="p">)</span>
+
+	<span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">item</span> <span class="o">:=</span> <span class="k">range</span> <span class="n">array</span> <span class="p">{</span>
+		<span class="n">item</span><span class="o">.</span><span class="n">Double</span><span class="p">()</span>
+	<span class="p">}</span>
+
+	<span class="n">fmt</span><span class="o">.</span><span class="n">Println</span><span class="p">(</span><span class="n">array</span><span class="p">)</span>
+<span class="p">}</span></code></pre>
+            </figure>
+            <p>It won’t work. When you iterate over array, item is a copy of the struct that’s in the array. Any changes we make to it are scoped to our for loop.</p>
+            <p>If you want to make changes to the array, you need to assign the updated struct to its index in the array.</p>
+            <figure class="highlight">
+              <pre><code class="language-go" data-lang="go"><span class="k">for</span> <span class="n">i</span> <span class="o">:=</span> <span class="m">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">array</span><span class="p">);</span> <span class="n">i</span><span class="o">++</span> <span class="p">{</span>
+	<span class="n">item</span> <span class="o">:=</span> <span class="n">array</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+	<span class="n">item</span><span class="o">.</span><span class="n">Double</span><span class="p">()</span>
+	<span class="n">array</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">item</span>
+<span class="p">}</span>
+
+<span class="n">fmt</span><span class="o">.</span><span class="n">Println</span><span class="p">(</span><span class="n">array</span><span class="p">)</span></code></pre>
+            </figure>
+            <p>If you use pointers in your arrays, you don’t have this problem. The item variable is a pointer, and you can manipulate the struct directly.</p>
+            <figure class="highlight">
+              <pre><code class="language-go" data-lang="go"><span class="n">pointerArray</span> <span class="o">:=</span> <span class="p">[]</span><span class="o">*</span><span class="n">Object</span><span class="p">{</span>
+	<span class="o">&amp;</span><span class="n">Object</span><span class="p">{</span>
+		<span class="n">Value</span><span class="o">:</span> <span class="m">0</span><span class="p">,</span>
+	<span class="p">},</span>
+	<span class="o">&amp;</span><span class="n">Object</span><span class="p">{</span>
+		<span class="n">Value</span><span class="o">:</span> <span class="m">1</span><span class="p">,</span>
+	<span class="p">},</span>
+	<span class="o">&amp;</span><span class="n">Object</span><span class="p">{</span>
+		<span class="n">Value</span><span class="o">:</span> <span class="m">2</span><span class="p">,</span>
+	<span class="p">},</span>
+<span class="p">}</span>
+
+<span class="n">fmt</span><span class="o">.</span><span class="n">Println</span><span class="p">(</span><span class="n">pointerArray</span><span class="p">)</span>
+
+<span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">item</span> <span class="o">:=</span> <span class="k">range</span> <span class="n">pointerArray</span> <span class="p">{</span>
+	<span class="n">item</span><span class="o">.</span><span class="n">Double</span><span class="p">()</span>
+<span class="p">}</span>
+
+<span class="n">fmt</span><span class="o">.</span><span class="n">Println</span><span class="p">(</span><span class="n">pointerArray</span><span class="p">)</span></code></pre>
+            </figure>
+            <p>Here’s a <a href="https://play.golang.org/p/9zaqm4kcwku">Go Playground</a> to play around with it.</p>
+          </div>
+          <a class="u-url" href="/2018/12/31/golang-use-pointers-in-slices.html" hidden></a>
+        </article>
+      </div>
+    </main>
+  </body>
+</html>

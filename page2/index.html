@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="initial-scale=1, viewport-fit=cover">
+    <meta name="google-site-verification" content="w449-YRInXMviD2YBTfFdb9hs54JylYloEurwuY9-nQ" />
+    <link rel="stylesheet" href="/assets/main.css"><!-- Begin Jekyll SEO tag v2.7.1 -->
+    <title>Page 2 of 3 for Blog | Weinert Works</title>
+    <meta name="generator" content="Jekyll v4.2.1" />
+    <meta property="og:title" content="Blog" />
+    <meta property="og:locale" content="en_US" />
+    <meta name="description" content="The works of Jim Weinert. Apps, experiments, and personal blog." />
+    <meta property="og:description" content="The works of Jim Weinert. Apps, experiments, and personal blog." />
+    <link rel="canonical" href="https://www.weinertworks.com/page2/" />
+    <meta property="og:url" content="https://www.weinertworks.com/page2/" />
+    <meta property="og:site_name" content="Weinert Works" />
+    <link rel="prev" href="https://www.weinertworks.com/" />
+    <link rel="next" href="https://www.weinertworks.com/page3" />
+    <meta name="twitter:card" content="summary" />
+    <meta property="twitter:title" content="Blog" />
+    <script type="application/ld+json">
+      {"headline":"Blog","url":"https://www.weinertworks.com/page2/","@type":"WebPage","description":"The works of Jim Weinert. Apps, experiments, and personal blog.","@context":"https://schema.org"}
+    </script>
+    <!-- End Jekyll SEO tag -->
+    <link type="application/atom+xml" rel="alternate" href="https://www.weinertworks.com/feed.xml" title="Weinert Works" /></head>
+  <body>
+    <header class="site-header">
+      <div class="container">
+        <a class="site-title" href="/">Weinert Works</a>
+        <nav class="site-nav">
+          <ul>
+            <li><a class="page-link" href="/">Blog</a></li>
+            <li><a class="page-link" href="/feed.xml">RSS</a></li>
+          </ul>
+        </nav>
+      </div>
+    </header>
+    <main class="page-content container" aria-label="Content">
+      <div class="wrapper">
+        <div class="blog">
+          <ul class="post-list">
+            <li>
+              <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+                <h1 class="post-title p-name" itemprop="name headline">
+                  <a class="post-link" href="/2018/02/23/fun-with-docker.html">Fun With Docker</a>
+                </h1>
+                <p class="post-meta">
+                  <time class="dt-published" datetime="2018-02-23T23:00:22-06:00" itemprop="datePublished">
+                    Feb 23, 2018
+                  </time>• <span itemprop="author" itemscope itemtype="http://schema.org/Person"><span class="p-author h-card" itemprop="name">Jim</span></span></p>
+                <div class="post-content e-content" itemprop="articleBody">
+                  <p>I really hate installing Java on my personal machines, but I still want to develop Scala. Part of the Docker promise is that you develop on the same environment as your production environment. Let’s actually set that up.</p>
+                  <p>Add this alias to your $HOME/.bashrc file. Reload your bashrc, and the sbt command will run the docker image in your current directory.</p>
+                  <figure class="highlight">
+                    <pre><code class="language-shell" data-lang="shell"><span class="nb">alias </span><span class="nv">sbt</span><span class="o">=</span><span class="s1">'docker run --rm --tty --interactive --volume "$PWD":/app bigtruedata/sbt'</span></code></pre>
+                  </figure>
+                  <p>What if you want to serve html from a random directory? Create another alias for the Apache docker image! This works great for any code coverage libraries that output to html.</p>
+                  <figure class="highlight">
+                    <pre><code class="language-shell" data-lang="shell"><span class="nb">alias </span><span class="nv">httpd</span><span class="o">=</span><span class="s1">'docker run --rm --tty --interactive -p 8000:80 --volume "$PWD":/usr/local/apache2/htdocs/ httpd'</span></code></pre>
+                  </figure>
+                  <p>Update: It’s a lot easier to start a web server using Python.</p>
+                  <div class="language-plaintext highlighter-rouge">
+                    <div class="highlight">
+                      <pre class="highlight"><code># Python 2
+python -m SimpleHTTPServer 8000
+
+# Python 3
+python -m http.server 8000
+</code></pre>
+                    </div>
+                  </div>
+                </div>
+              </article>
+            </li>
+            <li>
+              <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+                <h1 class="post-title p-name" itemprop="name headline">
+                  <a class="post-link" href="/2018/01/07/testing-your-kinesis-stream-with-kinesalite.html">Testing Your Kinesis Stream With Kinesalite</a>
+                </h1>
+                <p class="post-meta">
+                  <time class="dt-published" datetime="2018-01-07T14:13:16-06:00" itemprop="datePublished">
+                    Jan 7, 2018
+                  </time>• <span itemprop="author" itemscope itemtype="http://schema.org/Person"><span class="p-author h-card" itemprop="name">Jim</span></span></p>
+                <div class="post-content e-content" itemprop="articleBody">
+                  <h2 id="resources">Resources</h2>
+                  <ol>
+                    <li><a href="https://github.com/mhart/kinesalite">Kinesalite</a></li>
+                    <li><a href="http://www.gdks.co.uk/kinesalite">Getting started with Kinesalite by Gavin Stewart</a> - Gavin’s guide gave me the first clues that I needed to make this work</li>
+                    <li><a href="https://doc.akka.io/docs/akka/current/stream/stream-integrations.html#integrating-with-actors">Akka Stream Source.actorRef</a></li>
+                    <li><a href="https://developer.lightbend.com/docs/alpakka/current/kinesis.html">Akka Alpakka AWS Kinesis Connector</a></li>
+                    <li><a href="https://docs.aws.amazon.com/cli/latest/reference/kinesis/index.html">awscli kinesis commands</a></li>
+                  </ol>
+                  <p>At work I need to move an application to Kubernetes, but some of its logs are necessary for user usage data and tracking ad impressions. Setting up rolling logging from our container to AWS S3 looked more complicated and risky than <a href="#testing-kinesis-aside1">our current setup</a>, so we didn’t even investigate it. Other applications at the company use Amazon AWS Kinesis. It made sense to do the same. I wrote a code snippet to push log messages to Kinesis via an Akka Stream. I could get everything working in the REPL except for the part that pushes to Kinesis.</p>
+                  <p>I tried to use <a href="https://github.com/mhart/kinesalite">kinesalite</a>, an application which implements AWS Kinesis, but there aren’t any guides for getting it up and running. I assumed you would just start kinesalite, point your Kinesis endpoint at localhost with the right port, and it would just work. I did that, and nothing happened. No error messages, no kinesalite log messages, nothing.</p>
+                  <p>It took way too long (two days) to figure out how to write to kinesalite by….</p>
+                  <h2 id="writing-to-kinesis">Writing to Kinesis</h2>
+                  <p>Below is my example code to write to Kinesis. It creates an Akka Stream to which you can send messages. I tested each part of the Akka Stream in the Scala REPL.</p>
+                  <figure class="highlight">
+                    <pre><code class="language-scala" data-lang="scala"><span class="k">import</span> <span class="nn">scala.concurrent.duration._</span>
+
+<span class="k">import</span> <span class="nn">akka.actor.ActorSystem</span>
+<span class="k">import</span> <span class="nn">akka.stream.</span><span class="o">{</span><span class="nc">ActorMaterializer</span><span class="o">,</span> <span class="nc">Materializer</span><span class="o">}</span>
+<span class="k">import</span> <span class="nn">akka.stream.OverflowStrategy.fail</span>
+<span class="k">import</span> <span class="nn">akka.stream.alpakka.kinesis.KinesisFlowSettings</span>
+<span class="k">import</span> <span class="nn">akka.stream.alpakka.kinesis.scaladsl._</span>
+<span class="k">import</span> <span class="nn">akka.stream.scaladsl.Source</span>
+<span class="k">import</span> <span class="nn">akka.stream.scaladsl.</span><span class="o">{</span><span class="nc">Sink</span><span class="o">,</span> <span class="nc">Flow</span><span class="o">}</span>
+<span class="k">import</span> <span class="nn">akka.util.ByteString</span>
+<span class="k">import</span> <span class="nn">com.amazonaws.client.builder.AwsClientBuilder.EndpointConfiguration</span>
+<span class="k">import</span> <span class="nn">com.amazonaws.services.kinesis.AmazonKinesisAsync</span>
+<span class="k">import</span> <span class="nn">com.amazonaws.services.kinesis.AmazonKinesisAsyncClientBuilder</span>
+<span class="k">import</span> <span class="nn">com.amazonaws.services.kinesis.model.PutRecordsRequestEntry</span>
+
+<span class="k">implicit</span> <span class="k">val</span> <span class="nv">system</span><span class="k">:</span> <span class="kt">ActorSystem</span> <span class="o">=</span> <span class="nc">ActorSystem</span><span class="o">(</span><span class="s">"TestActor"</span><span class="o">)</span>
+<span class="k">implicit</span> <span class="k">val</span> <span class="nv">materializer</span><span class="k">:</span> <span class="kt">Materializer</span> <span class="o">=</span> <span class="nc">ActorMaterializer</span><span class="o">()</span>
+
+<span class="c1">// Create a Kinesis endpoint pointed at our local kinesalite</span>
+<span class="k">val</span> <span class="nv">endpoint</span> <span class="k">=</span> <span class="k">new</span> <span class="nc">EndpointConfiguration</span><span class="o">(</span><span class="s">"http://localhost:4567"</span><span class="o">,</span> <span class="s">"us-east-1"</span><span class="o">)</span>
+
+<span class="k">implicit</span> <span class="k">val</span> <span class="nv">amazonKinesisAsync</span><span class="k">:</span> <span class="kt">AmazonKinesisAsync</span> <span class="o">=</span> <span class="nv">AmazonKinesisAsyncClientBuilder</span><span class="o">.</span><span class="py">standard</span><span class="o">().</span><span class="py">withEndpointConfiguration</span><span class="o">(</span><span class="n">endpoint</span><span class="o">).</span><span class="py">build</span><span class="o">()</span>
+
+<span class="c1">// From the Akka Alpakka example</span>
+<span class="k">val</span> <span class="nv">flowSettings</span> <span class="k">=</span> <span class="nc">KinesisFlowSettings</span><span class="o">(</span><span class="n">parallelism</span> <span class="k">=</span> <span class="mi">1</span><span class="o">,</span>
+    <span class="n">maxBatchSize</span> <span class="k">=</span> <span class="mi">500</span><span class="o">,</span>
+    <span class="n">maxRecordsPerSecond</span> <span class="k">=</span> <span class="mi">1000</span><span class="o">,</span>
+    <span class="n">maxBytesPerSecond</span> <span class="k">=</span> <span class="mi">1000000</span><span class="o">,</span>
+    <span class="n">maxRetries</span> <span class="k">=</span> <span class="mi">5</span><span class="o">,</span>
+    <span class="n">backoffStrategy</span> <span class="k">=</span> <span class="nv">KinesisFlowSettings</span><span class="o">.</span><span class="py">Exponential</span><span class="o">,</span>
+    <span class="n">retryInitialTimeout</span> <span class="k">=</span> <span class="mi">100</span> <span class="n">millis</span>
+  <span class="o">)</span>
+
+<span class="k">val</span> <span class="nv">streamName</span> <span class="k">=</span> <span class="s">"myStreamName"</span>
+<span class="k">val</span> <span class="nv">partitionKey</span> <span class="k">=</span> <span class="s">"logs"</span>
+
+<span class="k">val</span> <span class="nv">loggingActor</span> <span class="k">=</span> <span class="nv">Source</span><span class="o">.</span><span class="py">actorRef</span><span class="o">[</span><span class="kt">String</span><span class="o">](</span><span class="nv">Int</span><span class="o">.</span><span class="py">MaxValue</span><span class="o">,</span> <span class="n">fail</span><span class="o">)</span>
+    <span class="o">.</span><span class="py">map</span><span class="o">(</span><span class="n">log</span> <span class="k">=&gt;</span> <span class="nc">ByteString</span><span class="o">(</span><span class="n">log</span><span class="o">).</span><span class="py">toByteBuffer</span><span class="o">)</span>
+    <span class="o">.</span><span class="py">map</span><span class="o">(</span><span class="n">data</span> <span class="k">=&gt;</span> <span class="k">new</span> <span class="nc">PutRecordsRequestEntry</span><span class="o">().</span><span class="py">withData</span><span class="o">(</span><span class="n">data</span><span class="o">).</span><span class="py">withPartitionKey</span><span class="o">(</span><span class="n">partitionKey</span><span class="o">))</span>
+    <span class="o">.</span><span class="py">to</span><span class="o">(</span><span class="nc">KinesisSink</span><span class="o">(</span><span class="n">streamName</span><span class="o">,</span> <span class="n">flowSettings</span><span class="o">))</span>
+    <span class="o">.</span><span class="py">run</span><span class="o">()</span>
+
+<span class="n">loggingActor</span> <span class="o">!</span> <span class="s">"testing this thing"</span>
+<span class="n">loggingActor</span> <span class="o">!</span> <span class="s">"test test"</span></code></pre>
+                  </figure>
+                  <h2 id="setting-fake-aws-credentials">Setting Fake AWS Credentials</h2>
+                  <p>Either the AWS Java SDK requires credentials (my bet) or Kinesalite requires credentials even though it doesn’t care what those credentials are. Create a $HOME/.aws/credentials file with the below contents.</p>
+                  <figure class="highlight">
+                    <pre><code class="language-shell" data-lang="shell"><span class="o">[</span>default]
+aws_access_key_id <span class="o">=</span> x
+aws_secret_access_key <span class="o">=</span> x
+region <span class="o">=</span> us-east-1</code></pre>
+                  </figure>
+                  <p>This was the last step I completed to get Kinesalite working. Neither the AWS Java SDK or Kinesalite showed a single error message when trying to connect to Kinesis without authentication credentials.</p>
+                  <h2 id="install-the-aws-cli-tool">Install the AWS CLI Tool</h2>
+                  <p>You need this to setup Kinesalite.</p>
+                  <figure class="highlight">
+                    <pre><code class="language-shell" data-lang="shell">// pip3 <span class="k">if </span>you<span class="s1">'re using Python 3 or just pip if it'</span>s properly aliased
+pip2 <span class="nb">install </span>awscli</code></pre>
+                  </figure>
+                  <h2 id="creating-your-stream">Creating Your Stream</h2>
+                  <p>I didn’t know you had to do this. Ops created our staging and production streams. I expected Kinesalite to accept requests for any stream, but I guess it behaves exactly like AWS Kinesis.</p>
+                  <p>Run the AWS CLI tool with the following parameters. It is super sensitive to typos. I copied and pasted from examples without any noticeable spelling errors. The only messages it will give is something like “–stream-name is requires”</p>
+                  <figure class="highlight">
+                    <pre><code class="language-shell" data-lang="shell"><span class="nv">AWS_ACCESS_KEY_ID</span><span class="o">=</span>x <span class="nv">AWS_SECRET_ACCESS_KEY</span><span class="o">=</span>x aws <span class="nt">--endpoint-url</span> http://localhost:4567/ kinesis create-stream <span class="nt">--stream-name</span><span class="o">=</span>myStreamName <span class="nt">--shard-count</span><span class="o">=</span>1 –-no-verify-ssl
+<span class="nv">AWS_ACCESS_KEY_ID</span><span class="o">=</span>x <span class="nv">AWS_SECRET_ACCESS_KEY</span><span class="o">=</span>x aws <span class="nt">--endpoint-url</span> http://localhost:4567/ kinesis list-streams</code></pre>
+                  </figure>
+                  <p>The first command creates your stream. The second command lists all existing streams.</p>
+                  <h2 id="send-messages-to-kinesis">Send Messages to Kinesis</h2>
+                  <p>In your REPL, send something to Kinesis.</p>
+                  <figure class="highlight">
+                    <pre><code class="language-scala" data-lang="scala"><span class="n">loggingActor</span> <span class="o">!</span> <span class="s">"testing this thing"</span>
+<span class="n">loggingActor</span> <span class="o">!</span> <span class="s">"test test"</span></code></pre>
+                  </figure>
+                  <h2 id="verifying-the-output">Verifying the Output</h2>
+                  <p>Two parts to reading what has been pushed to Kinesis. First you need to find the shard iterator to read data from the stream.</p>
+                  <figure class="highlight">
+                    <pre><code class="language-shell" data-lang="shell"><span class="nv">AWS_ACCESS_KEY_ID</span><span class="o">=</span>x <span class="nv">AWS_SECRET_ACCESS_KEY</span><span class="o">=</span>x aws <span class="nt">--endpoint-url</span> http://localhost:4567/ kinesis list-streams
+<span class="nv">AWS_ACCESS_KEY_ID</span><span class="o">=</span>x <span class="nv">AWS_SECRET_ACCESS_KEY</span><span class="o">=</span>x aws <span class="nt">--endpoint-url</span> http://localhost:4567/ kinesis describe-stream <span class="nt">--stream-name</span> myStreamName</code></pre>
+                  </figure>
+                  <p>Once you have the shard iterator, you can read all of the records since that iterator. Replace the –shard-iterator with the one in your output.</p>
+                  <figure class="highlight">
+                    <pre><code class="language-shell" data-lang="shell"><span class="nv">AWS_ACCESS_KEY_ID</span><span class="o">=</span>x <span class="nv">AWS_SECRET_ACCESS_KEY</span><span class="o">=</span>x aws <span class="nt">--endpoint-url</span> http://localhost:4567/ kinesis get-records <span class="nt">--shard-iterator</span> AAAAA+somekeyvalues</code></pre>
+                  </figure>
+                  <p>Your record is a base64 encoded string. The following scala snippet will decode it back to what you pushed to Kinesis.</p>
+                  <figure class="highlight">
+                    <pre><code class="language-scala" data-lang="scala"><span class="k">import</span> <span class="nn">java.util.Base64</span>
+
+<span class="k">def</span> <span class="nf">decode</span><span class="o">(</span><span class="n">str</span><span class="k">:</span> <span class="kt">String</span><span class="o">)</span><span class="k">:</span> <span class="kt">String</span> <span class="o">=</span> <span class="o">{</span>
+  <span class="nv">Base64</span><span class="o">.</span><span class="py">getDecoder</span><span class="o">.</span><span class="py">decode</span><span class="o">(</span><span class="n">str</span><span class="o">).</span><span class="py">map</span><span class="o">(</span><span class="nv">_</span><span class="o">.</span><span class="py">toChar</span><span class="o">).</span><span class="py">mkString</span>
+<span class="o">}</span></code></pre>
+                  </figure>
+                  <h2 id="sidenote-keep-your-libraries-up-to-date">Sidenote: Keep Your Libraries up to Date</h2>
+                  <p>Sending a Kinesis request for every log message is inefficient. There’s an Akka Flow called groupedWithin that lets you batch your requests by either a number of elements or a timeout. If you don’t reach the element limit within your timeout, groupedWithin will flush your batch. Even better there is <a href="https://doc.akka.io/docs/akka/current/stream/stages-overview.html?language=scala#groupedweightedwithin">groupedWeightedWithin</a> which lets you specify a weight. Kinesis has a 1MB limit for its payloads, so we can batch our requests until we get close to 1000000 bytes.</p>
+                  <p>We can’t use groupedWeightedWithin. Our application is still running on the Spray web framework. The latest Akka it supports is 2.4. The groupedWeightedWithin function wasn’t introduced until Akka 2.5.1. We’ll have to wait until we upgrade our application to Akka HTTP before we can use it.</p>
+                  <p>If we kept our libraries up to date, we would have access to groupedWeightedWithin.</p>
+                  <h2 id="asides">Asides</h2>
+                  <ol>
+                    <li id="testing-kinesis-aside1">Our current log roller was written by someone who doesn't work here anymore, and it's not dependable at all. It's based on <a href="https://logback.qos.ch">logback</a> which is designed to fail itself before it ever fails your application. One time we had a bug that could result in two instances of our application running at the same time. Only one of them was bound to the port that received connections. Our log rolling library would lock the log file during the roller over. Inevitably, the application not receiving requests would roll the logs and lock the other application out of ever writing to the log file.</li>
+                  </ol>
+                </div>
+              </article>
+            </li>
+            <li>
+              <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+                <h1 class="post-title p-name" itemprop="name headline">
+                  <a class="post-link" href="/2017/11/25/upgrading-postgresql-major-versions.html">Upgrading Postgresql Major Versions</a>
+                </h1>
+                <p class="post-meta">
+                  <time class="dt-published" datetime="2017-11-25T16:12:15-06:00" itemprop="datePublished">
+                    Nov 25, 2017
+                  </time>• <span itemprop="author" itemscope itemtype="http://schema.org/Person"><span class="p-author h-card" itemprop="name">Jim</span></span></p>
+                <div class="post-content e-content" itemprop="articleBody">
+                  <p>Every time I upgrade Postgres major versions, I need to google for these steps. This usually happens after I’ve run brew upgrade and my database stops working. Here are the steps for future reference.</p>
+                  <figure class="highlight">
+                    <pre><code class="language-shell" data-lang="shell"><span class="c"># Step 1</span>
+<span class="c"># Rename your posgres database directory</span>
+<span class="nb">mv</span> /usr/local/var/postgres /usr/local/var/postgres9.6
+
+<span class="c"># Step 2</span>
+<span class="c"># Using the latest version of postgresql, initialize a brand new database.</span>
+initdb /usr/local/var/postgres <span class="nt">-E</span> utf8
+
+<span class="c"># Step 3</span>
+<span class="c"># -d Location of the database being copied from</span>
+<span class="c"># -D Location of the database being copied to</span>
+<span class="c"># -b Location of the psql binary that can read from the 'from' database</span>
+<span class="c"># -B Location of the psql binary that can write to the 'to' database</span>
+pg_upgrade <span class="se">\</span>
+  <span class="nt">-d</span> /usr/local/var/postgres9.6 <span class="se">\</span>
+  <span class="nt">-D</span> /usr/local/var/postgres <span class="se">\</span>
+  <span class="nt">-b</span> /usr/local/Cellar/postgresql/9.6.5/bin/ <span class="se">\</span>
+  <span class="nt">-B</span> /usr/local/Cellar/postgresql/10.0/bin/ <span class="se">\</span>
+  <span class="nt">-v</span>
+
+<span class="c"># Revert if anything went wrong</span>
+<span class="c"># mv /usr/local/var/postgres9.6 /usr/local/var/postgres</span>
+<span class="c"># brew uninstall postgresql</span>
+<span class="c"># brew install postgresql@9.6</span></code></pre>
+                  </figure>
+                </div>
+              </article>
+            </li>
+            <li>
+              <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+                <h1 class="post-title p-name" itemprop="name headline">
+                  <a class="post-link" href="/2017/07/22/testing-at-work-and-in-the-home.html">Testing at Work and in the Home</a>
+                </h1>
+                <p class="post-meta">
+                  <time class="dt-published" datetime="2017-07-22T16:06:15-05:00" itemprop="datePublished">
+                    Jul 22, 2017
+                  </time>• <span itemprop="author" itemscope itemtype="http://schema.org/Person"><span class="p-author h-card" itemprop="name">Jim</span></span></p>
+                <div class="post-content e-content" itemprop="articleBody">
+                  <p>I was working on a personal project and feeling guilty about not writing enough tests. The two are different enough that no one should feel guilty for skimping on tests for their personal project.</p>
+                  <h2 id="at-work">At Work</h2>
+                  <p>Once a service is running in production, it never gets turned off. Decommissioning a service always ends with realizing some unknown party was using it and still needs it for their job. The standards for testing should be higher.</p>
+                  <p>You’re not the only person working on your project. There’s no better way to communicate to your teammates how you expect code to behave than good tests. Having a unit test for a ticket makes it harder to reintroduce the bug.</p>
+                  <p>If you’re starting a new service from scratch, testing should be a part of your project from the beginning. Pick frameworks that are easy to test. At work, we don’t use any Go router frameworks. They’re a huge pain to setup before each test.</p>
+                  <h2 id="at-home">At Home</h2>
+                  <p>In your personal projects, you’re the only person working on it. If you stop, it’s more likely to be abandoned than passed to another developer. It’s hard to justify tests if the project might not last a year.</p>
+                  <p>Unless you’re a pro at project management and have strict requirements, your side projects are going to have higher code churn than at work. How can you justify writing acceptance tests for a web page whose layout is constantly being tweaked?</p>
+                  <p>Test as much as you can, but don’t beat yourself up over it.</p>
+                </div>
+              </article>
+            </li>
+            <li>
+              <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+                <h1 class="post-title p-name" itemprop="name headline">
+                  <a class="post-link" href="/2017/04/25/rules-for-the-internet-of-things.html">Rules for the Internet of Things</a>
+                </h1>
+                <p class="post-meta">
+                  <time class="dt-published" datetime="2017-04-25T00:50:14-05:00" itemprop="datePublished">
+                    Apr 25, 2017
+                  </time>• <span itemprop="author" itemscope itemtype="http://schema.org/Person"><span class="p-author h-card" itemprop="name">Jim</span></span></p>
+                <div class="post-content e-content" itemprop="articleBody">
+                  <p>My dream for the internet of things is a bunch of different devices coordinating with each other. My air conditioner, humidifier, and dehumidifier should all work together to keep my apartment climate controlled and prevent me from ever having dry, cracked hands ever again. Having connected devices work together feels so far away. As we baby step towards my dream, here are some rules all internet of things devices should follow.</p>
+                  <h2 id="any-services-need-to-last-as-long-as-a-dumb-version-of-the-device-would">Any services need to last as long as a dumb version of the device would</h2>
+                  <p>Washing machines and refrigerators can last ten to twenty years. Your 1985 Nintendo probably still works. Electrical components don’t degrade like mechanical components do, so the internet of things devices need to last at least as long as their mechanical counterpart.</p>
+                  <h2 id="devices-should-still-work-without-internet">Devices should still work without internet</h2>
+                  <p>All devices need manual controls. If the internet is out or if a storm is making the internet unreliable, the smart device should still be useable. Your Juicero doesn’t need to connect to the internet to squeeze a packet of juice.</p>
+                  <h2 id="devices-need-to-be-repairable-or-modular">Devices need to be repairable or modular</h2>
+                  <p>If the wifi on my refrigerator breaks, I can’t take it into an Apple store without renting a truck. Even worse, I probably bought an LG fridge, and LG doesn’t have stores at the local mall. The smart parts of appliances need to be replaceable by the owner or be a separate module from the appliance. Also, if I detach a smart module from my refrigerator, the refrigerator should still work.</p>
+                  <h2 id="devices-should-be-useable-while-updates-are-installing">Devices should be useable while updates are installing</h2>
+                  <p>Servers store two versions of their firmware, the latest update and the previous update. When you install a firmware update, the server overwrites the older update and boots from that location.</p>
+                  <h2 id="services-need-to-be-open-source">Services need to be open source</h2>
+                  <p>To ensure it lasts, the devices, their api, and the hubs that control them need to be open source. Ideally all companies would open source their device software when that device reaches end of life. That’s never happened, so we need internet of things devices to be open source from the start. If you can’t recreate a device’s server features in AWS, it’s worthless.</p>
+                  <h2 id="devices-need-to-work-with-multiple-brands-of-hubs">Devices need to work with multiple brands of hubs</h2>
+                  <p>We can’t have an app for each device. Devices need an easy to use API and support for the most common hubs.</p>
+                  <h2 id="they-need-to-be-secure-no-default-passwords">They need to be secure (No default passwords)</h2>
+                  <p>Configuring a smart device should require pairing with the user’s computer or phone. If the device requires connecting to a service, make the user create an account or tie the account to the phone app. Unconfigured devices shouldn’t be allowed access outside the user’s home network.</p>
+                  <h2 id="stop-with-the-worthless-metrics">Stop with the worthless metrics</h2>
+                  <p>Internet of things devices need to improve your life instead of measuring it. I don’t need to know how much water I drink every day. I don’t need a smart pillow or a smart bed. Not now. Not ever.</p>
+                  <p>Not everything needs to be connected. Somethings can be dumb.</p>
+                  <h2 id="design-for-our-wired-future">Design for our wired future</h2>
+                  <p>It’s maddening to have expensive light bulbs with wireless chips instead of expensive lamps and ceiling fans and cheap led bulbs. I get that it is easier to convince people to try out smart light bulbs when they don’t need to rewire their home, but the market has been proven. People love programmable light bulbs that can change color. Light bulbs are going to burn out. They shouldn’t be expensive. They shouldn’t be wireless.</p>
+                  <p>We don’t need more wireless things. All of our wall outlets are going to be USB-C someday. Someone needs to start building the products that take advantage of our fast, low powered, wired future.</p>
+                </div>
+              </article>
+            </li>
+            <li>
+              <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+                <h1 class="post-title p-name" itemprop="name headline">
+                  <a class="post-link" href="/2017/02/22/the-dream-of-tech-company-culture-is-a-lie.html">The Dream of Tech Company Culture Is a Lie</a>
+                </h1>
+                <p class="post-meta">
+                  <time class="dt-published" datetime="2017-02-22T01:49:43-06:00" itemprop="datePublished">
+                    Feb 22, 2017
+                  </time>• <span itemprop="author" itemscope itemtype="http://schema.org/Person"><span class="p-author h-card" itemprop="name">Jim</span></span></p>
+                <div class="post-content e-content" itemprop="articleBody">
+                  <p>The power is out. I want to write a blog post, but the only thing worth talking about this week is <a href="https://www.susanjfowler.com/blog/2017/2/19/reflecting-on-one-very-strange-year-at-uber">Susan J. Fowler’s story about her awful year at Uber.</a></p>
+                  <p>My friends will share her story commenting that “if this is true, it’s damning.”</p>
+                  <p>*sigh*</p>
+                  <p>I’m convinced it’s true.</p>
+                  <p>Uber has a history of <a href="https://pxlnv.com/blog/uber-history/">bad behavior</a> and <a href="https://www.buzzfeed.com/charliewarzel/french-uber-bird-hunting-promotion-pairs-lyon-riders-with-a?utm_term=.apbBPkvQD#.hmMKjD1y0">misogyny</a>, and then Uber’s head of HR left to join Twitter which <a href="https://pando.com/2016/07/14/ubers-head-hr-leaves-huge-potential-payday-join-twitter/">doesn’t make a lot of sense</a>.</p>
+                  <p>Even at our favorite companies senior managers will <a href="https://bits.blogs.nytimes.com/2014/04/21/github-founder-resigns-after-investigation/?_r=0">harass female employees</a> and those companies’ employees eventually find out that <a href="https://zachholman.com/talk/firing-people">HR exists to protect the company from liability and not to help them</a>.</p>
+                </div>
+              </article>
+            </li>
+            <li>
+              <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+                <h1 class="post-title p-name" itemprop="name headline">
+                  <a class="post-link" href="/2016/12/04/jiro-dreams-of-sushi.html">Jiro Dreams of Sushi</a>
+                </h1>
+                <p class="post-meta">
+                  <time class="dt-published" datetime="2016-12-04T23:23:54-06:00" itemprop="datePublished">
+                    Dec 4, 2016
+                  </time>• <span itemprop="author" itemscope itemtype="http://schema.org/Person"><span class="p-author h-card" itemprop="name">Jim</span></span></p>
+                <div class="post-content e-content" itemprop="articleBody">
+                  <blockquote class="twitter-tweet" data-lang="en">
+                    <p lang="en" dir="ltr">Hiring people with a strong sense of entitlement very rarely works out, no matter how good they are on other axes</p>
+                    &mdash; Sam Altman (@sama) <a href="https://twitter.com/sama/status/803836981142757378">November 30, 2016</a></blockquote>
+                  <script async="" src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
+                  <p>The absolute opposites of an entitled employee are the apprentices in <a href="http://www.imdb.com/title/tt1772925/">Jiro Dreams of Sushi</a>. The apprentices have to work for ten years making rice and doing other menial tasks before they’re allowed to make a dish. Jiro’s desire for perfection really shows his dedication to his craft.</p>
+                  <blockquote>
+                    <p>The film paints a portrait of an exacting patriarch who demands perfection from himself, his sons, and the hard-working apprentices who work up to 10 years before being allowed to cook eggs.</p>
+                    &mdash; <a href="http://influencefilmclub.com/wp-content/uploads/2014/02/Jiro-Dreams-of-Sushi-Discussion-Guide.pdf">Influence Film Forum</a></blockquote>
+                  <p>Although… why would anyone put up with that? If you were even a mediocre chef, why would you toil under Jiro instead of creating your own restaurant or being a more senior chef at another restaurant? Only two types of employees will apprentice with Jiro, the sushi fanatics and the people who can’t find a job anywhere else.</p>
+                  <p>Sam Altman wants employees who have no where else to go.</p>
+                </div>
+              </article>
+            </li>
+            <li>
+              <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+                <h1 class="post-title p-name" itemprop="name headline">
+                  <a class="post-link" href="/2016/10/24/tictactoe-scala.html">TicTacToe.scala</a>
+                </h1>
+                <p class="post-meta">
+                  <time class="dt-published" datetime="2016-10-24T00:38:54-05:00" itemprop="datePublished">
+                    Oct 24, 2016
+                  </time>• <span itemprop="author" itemscope itemtype="http://schema.org/Person"><span class="p-author h-card" itemprop="name">Jim</span></span></p>
+                <div class="post-content e-content" itemprop="articleBody">
+                  <p>Scala finally clicked. It took a year of writing production code with it and completing Coursera’s <a href="https://www.coursera.org/learn/progfun1">Functional Programming Principles in Scala</a> course (lucky me, it’s taught by the creator of Scala, Martin Odersky). When I got to the programming exercises in the Scala chapter of <a href="https://pragprog.com/book/btlang/seven-languages-in-seven-weeks">Seven Languages in Seven Weeks</a>, I wanted my code to follow every Scala principle. I wanted to only use immutable variables and use functional programming components instead of for loops.</p>
+                  <p>Here’s my tic tac toe code in its entirety. You can run it using Scala’s <a href="#tictactoe-1-aside1">REPL</a>. I didn’t want to spend an entire weekend optimizing it, so this is the first complete version. I’ll tell you <a href="#the-problems">why it sucks</a> at the later.</p>
+                  <h2 id="the-code">The Code</h2>
+                  <figure class="highlight">
+                    <pre><code class="language-scala" data-lang="scala"><span class="k">class</span> <span class="nc">Player</span><span class="o">()</span>
+<span class="k">case</span> <span class="k">class</span> <span class="nc">X</span><span class="o">()</span> <span class="k">extends</span> <span class="nc">Player</span> <span class="o">{</span>
+  <span class="k">override</span> <span class="k">def</span> <span class="nf">toString</span><span class="o">()</span><span class="k">:</span> <span class="kt">String</span> <span class="o">=</span> <span class="o">{</span>
+    <span class="s">"X"</span>
+  <span class="o">}</span>
+<span class="o">}</span>
+<span class="k">case</span> <span class="k">class</span> <span class="nc">O</span><span class="o">()</span> <span class="k">extends</span> <span class="nc">Player</span> <span class="o">{</span>
+  <span class="k">override</span> <span class="k">def</span> <span class="nf">toString</span><span class="o">()</span><span class="k">:</span> <span class="kt">String</span> <span class="o">=</span> <span class="o">{</span>
+    <span class="s">"O"</span>
+  <span class="o">}</span>
+<span class="o">}</span>
+
+<span class="k">type</span> <span class="kt">Owner</span> <span class="o">=</span> <span class="nc">Option</span><span class="o">[</span><span class="kt">Player</span><span class="o">]</span>
+
+<span class="k">class</span> <span class="nc">Status</span><span class="o">()</span>
+<span class="k">case</span> <span class="k">class</span> <span class="nc">Winner</span><span class="o">(</span><span class="n">player</span><span class="k">:</span> <span class="kt">Player</span><span class="o">)</span> <span class="k">extends</span> <span class="nc">Status</span>
+<span class="k">case</span> <span class="k">class</span> <span class="nc">InProgress</span><span class="o">()</span> <span class="k">extends</span> <span class="nc">Status</span>
+<span class="k">case</span> <span class="k">class</span> <span class="nc">Draw</span><span class="o">()</span> <span class="k">extends</span> <span class="nc">Status</span>
+
+<span class="k">case</span> <span class="k">class</span> <span class="nc">Tile</span><span class="o">(</span><span class="n">loc</span><span class="k">:</span> <span class="kt">Int</span><span class="o">,</span> <span class="n">owner</span><span class="k">:</span> <span class="kt">Owner</span><span class="o">)</span> <span class="o">{</span>
+  <span class="k">override</span> <span class="k">def</span> <span class="nf">toString</span><span class="o">()</span><span class="k">:</span> <span class="kt">String</span> <span class="o">=</span> <span class="o">{</span>
+    <span class="n">owner</span> <span class="k">match</span> <span class="o">{</span>
+      <span class="k">case</span> <span class="nc">Some</span><span class="o">(</span><span class="n">player</span><span class="o">)</span> <span class="k">=&gt;</span> <span class="nv">player</span><span class="o">.</span><span class="py">toString</span>
+      <span class="k">case</span> <span class="k">_</span> <span class="k">=&gt;</span> <span class="n">s</span><span class="s">"$loc"</span>
+    <span class="o">}</span>
+  <span class="o">}</span>
+<span class="o">}</span>
+
+<span class="k">val</span> <span class="nv">blankState</span> <span class="k">=</span> <span class="o">(</span><span class="mi">0</span> <span class="n">to</span> <span class="mi">8</span><span class="o">).</span><span class="py">map</span><span class="o">(</span><span class="n">loc</span> <span class="k">=&gt;</span> <span class="k">new</span> <span class="nc">Tile</span><span class="o">(</span><span class="n">loc</span><span class="o">,</span> <span class="nc">None</span><span class="o">)).</span><span class="py">toList</span>
+
+<span class="k">case</span> <span class="k">class</span> <span class="nc">Board</span><span class="o">(</span><span class="n">state</span><span class="k">:</span> <span class="kt">List</span><span class="o">[</span><span class="kt">Tile</span><span class="o">]</span> <span class="k">=</span> <span class="n">blankState</span><span class="o">,</span> <span class="n">nextPlayer</span><span class="k">:</span> <span class="kt">Player</span> <span class="o">=</span> <span class="nf">X</span><span class="o">())</span> <span class="o">{</span>
+  <span class="k">def</span> <span class="nf">move</span><span class="o">(</span><span class="n">loc</span><span class="k">:</span> <span class="kt">Int</span><span class="o">)</span> <span class="k">:</span> <span class="kt">Board</span> <span class="o">=</span> <span class="o">{</span>
+    <span class="nf">val</span> <span class="o">(</span><span class="n">front</span><span class="o">,</span> <span class="n">back</span><span class="o">)</span> <span class="k">=</span> <span class="nv">state</span><span class="o">.</span><span class="py">splitAt</span><span class="o">(</span><span class="n">loc</span><span class="o">)</span>
+
+    <span class="n">back</span> <span class="k">match</span> <span class="o">{</span>
+      <span class="k">case</span> <span class="nc">Tile</span><span class="o">(</span><span class="k">_</span><span class="o">,</span> <span class="nc">None</span><span class="o">)</span> <span class="o">::</span> <span class="n">tail</span> <span class="k">=&gt;</span> <span class="o">{</span>
+        <span class="k">val</span> <span class="nv">newState</span> <span class="k">=</span> <span class="n">front</span> <span class="o">:::</span> <span class="k">new</span> <span class="nc">Tile</span><span class="o">(</span><span class="n">loc</span><span class="o">,</span> <span class="nc">Some</span><span class="o">(</span><span class="n">nextPlayer</span><span class="o">))</span> <span class="o">::</span> <span class="n">tail</span>
+        <span class="k">new</span> <span class="nc">Board</span><span class="o">(</span><span class="n">newState</span><span class="o">,</span> <span class="n">otherPlayer</span><span class="o">)</span>
+      <span class="o">}</span>
+      <span class="k">case</span> <span class="k">_</span> <span class="k">=&gt;</span> <span class="k">throw</span> <span class="k">new</span> <span class="nc">Error</span><span class="o">(</span><span class="n">s</span><span class="s">"Invalid location $loc"</span><span class="o">)</span>
+    <span class="o">}</span>
+  <span class="o">}</span>
+
+  <span class="k">def</span> <span class="nf">otherPlayer</span> <span class="k">=</span> <span class="o">{</span>
+    <span class="n">nextPlayer</span> <span class="k">match</span> <span class="o">{</span>
+      <span class="k">case</span> <span class="nf">X</span><span class="o">()</span> <span class="k">=&gt;</span> <span class="nf">O</span><span class="o">()</span>
+      <span class="k">case</span> <span class="nf">O</span><span class="o">()</span> <span class="k">=&gt;</span> <span class="nf">X</span><span class="o">()</span>
+    <span class="o">}</span>
+  <span class="o">}</span>
+
+  <span class="c1">// val (x, y) = (v % 3, v / 3)</span>
+  <span class="c1">// 0,0 | 1,0 | 2,0</span>
+  <span class="c1">// 0,1 | 1,1 | 2,1</span>
+  <span class="c1">// 0,2 | 1,2 | 2,2</span>
+  <span class="k">def</span> <span class="nf">gameState</span> <span class="k">:</span> <span class="kt">Status</span> <span class="o">=</span> <span class="o">{</span>
+    <span class="nf">val</span> <span class="o">(</span><span class="n">placements</span><span class="o">,</span> <span class="n">movesLeft</span><span class="o">)</span> <span class="k">=</span> <span class="nv">state</span><span class="o">.</span><span class="py">foldLeft</span><span class="o">(</span><span class="nc">Map</span><span class="o">[</span><span class="kt">String</span>, <span class="kt">Owner</span><span class="o">](),</span> <span class="mi">0</span><span class="o">)</span> <span class="o">{</span> <span class="o">(</span><span class="n">result</span><span class="o">,</span> <span class="n">tile</span><span class="o">)</span> <span class="k">=&gt;</span>
+      <span class="nf">val</span> <span class="o">(</span><span class="n">collection</span><span class="o">,</span> <span class="n">movesLeft</span><span class="o">)</span> <span class="k">=</span> <span class="n">result</span>
+
+      <span class="k">def</span> <span class="nf">newVal</span><span class="o">(</span><span class="n">key</span><span class="k">:</span> <span class="kt">String</span><span class="o">)</span> <span class="k">=</span> <span class="o">{</span>
+        <span class="nv">collection</span><span class="o">.</span><span class="py">get</span><span class="o">(</span><span class="n">key</span><span class="o">)</span> <span class="k">match</span> <span class="o">{</span>
+          <span class="k">case</span> <span class="nc">None</span> <span class="k">=&gt;</span> <span class="o">{</span>
+            <span class="nv">tile</span><span class="o">.</span><span class="py">owner</span>
+          <span class="o">}</span>
+          <span class="k">case</span> <span class="nc">Some</span><span class="o">(</span><span class="n">owner</span><span class="o">)</span> <span class="k">if</span> <span class="n">owner</span> <span class="o">==</span> <span class="nv">tile</span><span class="o">.</span><span class="py">owner</span> <span class="k">=&gt;</span> <span class="o">{</span>
+            <span class="n">owner</span>
+          <span class="o">}</span>
+          <span class="k">case</span> <span class="k">_</span> <span class="k">=&gt;</span> <span class="o">{</span>
+            <span class="nc">None</span>
+          <span class="o">}</span>
+        <span class="o">}</span>
+      <span class="o">}</span>
+
+      <span class="nf">val</span> <span class="o">(</span><span class="n">x</span><span class="o">,</span> <span class="n">y</span><span class="o">)</span> <span class="k">=</span> <span class="o">(</span><span class="nv">tile</span><span class="o">.</span><span class="py">loc</span> <span class="o">%</span> <span class="mi">3</span><span class="o">,</span> <span class="nv">tile</span><span class="o">.</span><span class="py">loc</span> <span class="o">/</span> <span class="mi">3</span><span class="o">)</span>
+
+      <span class="k">val</span> <span class="nv">rowKey</span> <span class="k">=</span> <span class="n">s</span><span class="s">"row$y"</span>
+      <span class="k">val</span> <span class="nv">rowVal</span> <span class="k">=</span> <span class="nf">newVal</span><span class="o">(</span><span class="n">rowKey</span><span class="o">)</span>
+
+      <span class="k">val</span> <span class="nv">colKey</span> <span class="k">=</span> <span class="n">s</span><span class="s">"col$x"</span>
+      <span class="k">val</span> <span class="nv">colVal</span> <span class="k">=</span> <span class="nf">newVal</span><span class="o">(</span><span class="n">colKey</span><span class="o">)</span>
+
+      <span class="k">val</span> <span class="nv">diag1Key</span> <span class="k">=</span> <span class="s">"diag1"</span>
+      <span class="k">val</span> <span class="nv">diag1Val</span> <span class="k">=</span> <span class="nf">newVal</span><span class="o">(</span><span class="n">diag1Key</span><span class="o">)</span>
+
+      <span class="k">val</span> <span class="nv">diag2Key</span> <span class="k">=</span> <span class="s">"diag2"</span>
+      <span class="k">val</span> <span class="nv">diag2Val</span> <span class="k">=</span> <span class="nf">newVal</span><span class="o">(</span><span class="n">diag2Key</span><span class="o">)</span>
+
+      <span class="k">val</span> <span class="nv">newVals</span> <span class="k">=</span> <span class="nf">if</span> <span class="o">(</span><span class="n">x</span> <span class="o">==</span> <span class="n">y</span> <span class="o">&amp;&amp;</span> <span class="n">x</span> <span class="o">+</span> <span class="n">y</span> <span class="o">==</span> <span class="mi">2</span><span class="o">)</span> <span class="o">{</span>
+        <span class="nc">Map</span><span class="o">(</span><span class="n">diag1Key</span> <span class="o">-&gt;</span> <span class="n">diag1Val</span><span class="o">,</span> <span class="n">diag2Key</span> <span class="o">-&gt;</span> <span class="n">diag2Val</span><span class="o">,</span> <span class="n">rowKey</span> <span class="o">-&gt;</span> <span class="n">rowVal</span><span class="o">,</span> <span class="n">colKey</span> <span class="o">-&gt;</span> <span class="n">colVal</span><span class="o">)</span>
+      <span class="o">}</span> <span class="k">else</span> <span class="nf">if</span> <span class="o">(</span><span class="n">x</span> <span class="o">==</span> <span class="n">y</span><span class="o">)</span> <span class="o">{</span>
+        <span class="nc">Map</span><span class="o">(</span><span class="n">diag1Key</span> <span class="o">-&gt;</span> <span class="n">diag1Val</span><span class="o">,</span> <span class="n">rowKey</span> <span class="o">-&gt;</span> <span class="n">rowVal</span><span class="o">,</span> <span class="n">colKey</span> <span class="o">-&gt;</span> <span class="n">colVal</span><span class="o">)</span>
+      <span class="o">}</span> <span class="k">else</span> <span class="nf">if</span> <span class="o">(</span><span class="n">x</span> <span class="o">+</span> <span class="n">y</span> <span class="o">==</span> <span class="mi">2</span><span class="o">)</span> <span class="o">{</span>
+        <span class="nc">Map</span><span class="o">(</span><span class="n">diag2Key</span> <span class="o">-&gt;</span> <span class="n">diag2Val</span><span class="o">,</span> <span class="n">rowKey</span> <span class="o">-&gt;</span> <span class="n">rowVal</span><span class="o">,</span> <span class="n">colKey</span> <span class="o">-&gt;</span> <span class="n">colVal</span><span class="o">)</span>
+      <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
+        <span class="nc">Map</span><span class="o">(</span><span class="n">rowKey</span> <span class="o">-&gt;</span> <span class="n">rowVal</span><span class="o">,</span> <span class="n">colKey</span> <span class="o">-&gt;</span> <span class="n">colVal</span><span class="o">)</span>
+      <span class="o">}</span>
+
+      <span class="k">val</span> <span class="nv">move</span> <span class="k">=</span> <span class="nf">if</span> <span class="o">(</span><span class="nv">tile</span><span class="o">.</span><span class="py">owner</span><span class="o">.</span><span class="py">isEmpty</span><span class="o">)</span> <span class="mi">1</span> <span class="k">else</span> <span class="mi">0</span>
+      <span class="o">(</span><span class="n">collection</span> <span class="o">++</span> <span class="n">newVals</span><span class="o">,</span> <span class="n">movesLeft</span> <span class="o">+</span> <span class="n">move</span><span class="o">)</span>
+    <span class="o">}</span>
+
+    <span class="k">def</span> <span class="nf">findWinner</span><span class="o">(</span><span class="n">values</span><span class="k">:</span> <span class="kt">List</span><span class="o">[</span><span class="kt">Owner</span><span class="o">])</span> <span class="k">:</span> <span class="kt">Status</span> <span class="o">=</span> <span class="n">values</span> <span class="k">match</span> <span class="o">{</span>
+      <span class="k">case</span> <span class="nc">List</span><span class="o">()</span> <span class="k">=&gt;</span> <span class="nc">InProgress</span><span class="o">()</span>
+      <span class="k">case</span> <span class="n">head</span> <span class="o">::</span> <span class="n">tail</span> <span class="k">=&gt;</span> <span class="n">head</span> <span class="k">match</span> <span class="o">{</span>
+        <span class="k">case</span> <span class="nc">Some</span><span class="o">(</span><span class="n">x</span><span class="o">)</span> <span class="k">=&gt;</span> <span class="nc">Winner</span><span class="o">(</span><span class="n">x</span><span class="o">)</span>
+        <span class="k">case</span> <span class="nc">None</span> <span class="k">=&gt;</span> <span class="nf">findWinner</span><span class="o">(</span><span class="n">tail</span><span class="o">)</span>
+      <span class="o">}</span>
+    <span class="o">}</span>
+
+    <span class="nf">if</span> <span class="o">(</span><span class="n">movesLeft</span> <span class="o">==</span> <span class="mi">0</span><span class="o">)</span> <span class="o">{</span>
+      <span class="nc">Draw</span><span class="o">()</span>
+    <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
+      <span class="nf">findWinner</span><span class="o">(</span><span class="nv">placements</span><span class="o">.</span><span class="py">values</span><span class="o">.</span><span class="py">toList</span><span class="o">)</span>
+    <span class="o">}</span>
+  <span class="o">}</span>
+
+  <span class="k">override</span> <span class="k">def</span> <span class="nf">toString</span><span class="o">()</span><span class="k">:</span> <span class="kt">String</span> <span class="o">=</span> <span class="o">{</span>
+    <span class="nv">state</span><span class="o">.</span><span class="py">grouped</span><span class="o">(</span><span class="mi">3</span><span class="o">).</span><span class="py">map</span><span class="o">(</span><span class="nv">_</span><span class="o">.</span><span class="py">mkString</span><span class="o">(</span><span class="s">"|"</span><span class="o">)).</span><span class="py">mkString</span><span class="o">(</span><span class="s">"\n"</span><span class="o">)</span>
+  <span class="o">}</span>
+<span class="o">}</span>
+
+<span class="k">def</span> <span class="nf">playGame</span><span class="o">(</span><span class="n">game</span><span class="k">:</span> <span class="kt">Board</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">Board</span><span class="o">())</span> <span class="k">:</span> <span class="kt">Unit</span> <span class="o">=</span> <span class="o">{</span>
+  <span class="nv">game</span><span class="o">.</span><span class="py">gameState</span> <span class="k">match</span> <span class="o">{</span>
+    <span class="k">case</span> <span class="nc">Winner</span><span class="o">(</span><span class="n">player</span><span class="o">)</span> <span class="k">=&gt;</span> <span class="nf">println</span><span class="o">(</span><span class="n">s</span><span class="s">"$player is victorious!\n$game"</span><span class="o">)</span>
+    <span class="k">case</span> <span class="nc">Draw</span><span class="o">()</span> <span class="k">=&gt;</span> <span class="nf">println</span><span class="o">(</span><span class="n">s</span><span class="s">"There are no moves left. It's a stupid tie.\n$game"</span><span class="o">)</span>
+    <span class="k">case</span> <span class="nc">InProgress</span><span class="o">()</span> <span class="k">=&gt;</span> <span class="o">{</span>
+      <span class="k">try</span> <span class="o">{</span>
+        <span class="nv">game</span><span class="o">.</span><span class="py">nextPlayer</span> <span class="k">match</span> <span class="o">{</span>
+          <span class="k">case</span> <span class="nf">X</span><span class="o">()</span> <span class="k">=&gt;</span> <span class="nf">println</span><span class="o">(</span><span class="s">"Player 1, your move"</span><span class="o">)</span>
+          <span class="k">case</span> <span class="nf">O</span><span class="o">()</span> <span class="k">=&gt;</span> <span class="nf">println</span><span class="o">(</span><span class="s">"Player 2, your move"</span><span class="o">)</span>
+        <span class="o">}</span>
+        <span class="nf">println</span><span class="o">(</span><span class="n">s</span><span class="s">"$game\n"</span><span class="o">)</span>
+
+        <span class="k">val</span> <span class="nv">nextMove</span> <span class="k">=</span> <span class="nv">scala</span><span class="o">.</span><span class="py">io</span><span class="o">.</span><span class="py">StdIn</span><span class="o">.</span><span class="py">readInt</span><span class="o">()</span>
+
+        <span class="nf">playGame</span><span class="o">(</span><span class="nv">game</span><span class="o">.</span><span class="py">move</span><span class="o">(</span><span class="n">nextMove</span><span class="o">))</span>
+      <span class="o">}</span> <span class="k">catch</span> <span class="o">{</span>
+        <span class="k">case</span> <span class="n">e</span><span class="k">:</span> <span class="kt">Throwable</span> <span class="o">=&gt;</span> <span class="o">{</span>
+          <span class="nf">println</span><span class="o">(</span><span class="n">s</span><span class="s">"Error making a move\n${e.getMessage}"</span><span class="o">)</span>
+          <span class="nf">playGame</span><span class="o">(</span><span class="n">game</span><span class="o">)</span>
+        <span class="o">}</span>
+      <span class="o">}</span>
+    <span class="o">}</span>
+  <span class="o">}</span>
+<span class="o">}</span>
+
+<span class="nf">playGame</span><span class="o">()</span></code></pre>
+                  </figure>
+                  <h2 id="the-highlights">The Highlights</h2>
+                  <p>I’m pretty proud of it. It highlights the best parts of Scala which are the case classes, match statements, and decomposing an object in a match statement.</p>
+                  <h3 id="case--classes">Case  Classes</h3>
+                  <p>Case classes are like fancy, extendable enums. They can inherit from other classes, override default methods like toString, and have new methods. We can create a fake-enum type by having our case classes inherit from a Player base class.</p>
+                  <figure class="highlight">
+                    <pre><code class="language-scala" data-lang="scala"><span class="k">class</span> <span class="nc">Player</span><span class="o">()</span>
+<span class="k">case</span> <span class="k">class</span> <span class="nc">X</span><span class="o">()</span> <span class="k">extends</span> <span class="nc">Player</span>
+<span class="k">case</span> <span class="k">class</span> <span class="nc">O</span><span class="o">()</span> <span class="k">extends</span> <span class="nc">Player</span>
+
+<span class="k">val</span> <span class="nv">x1</span> <span class="k">=</span> <span class="nf">X</span><span class="o">()</span>
+<span class="k">val</span> <span class="nv">x2</span> <span class="k">=</span> <span class="nf">X</span><span class="o">()</span>
+
+<span class="c1">// true</span>
+<span class="n">x1</span> <span class="o">==</span> <span class="n">x2</span></code></pre>
+                  </figure>
+                  <p>Case classes can have constructor arguments. This lets us associate a value with the enum.</p>
+                  <figure class="highlight">
+                    <pre><code class="language-scala" data-lang="scala"><span class="k">class</span> <span class="nc">Status</span><span class="o">()</span>
+<span class="k">case</span> <span class="k">class</span> <span class="nc">Winner</span><span class="o">(</span><span class="n">player</span><span class="k">:</span> <span class="kt">Player</span><span class="o">)</span> <span class="k">extends</span> <span class="nc">Status</span>
+<span class="k">case</span> <span class="k">class</span> <span class="nc">InProgress</span><span class="o">()</span> <span class="k">extends</span> <span class="nc">Status</span>
+<span class="k">case</span> <span class="k">class</span> <span class="nc">Draw</span><span class="o">()</span> <span class="k">extends</span> <span class="nc">Status</span>
+
+<span class="k">val</span> <span class="nv">w1</span> <span class="k">=</span> <span class="nc">Winner</span><span class="o">(</span><span class="nf">X</span><span class="o">())</span>
+<span class="k">val</span> <span class="nv">w2</span> <span class="k">=</span> <span class="nc">Winner</span><span class="o">(</span><span class="nf">O</span><span class="o">())</span>
+
+<span class="c1">// false</span>
+<span class="n">w1</span> <span class="o">==</span> <span class="n">w2</span></code></pre>
+                  </figure>
+                  <h3 id="match-statements">Match Statements</h3>
+                  <p>Match statements are like fancy switch statements. They evaluate in order and can include additional logic. In Scala the underscore is the <a href="#tictactoe-1-aside2">we don’t care character</a>. In a switch statement it will always evaluate. Because it’s always evaluated, it should always be your last case match.</p>
+                  <figure class="highlight">
+                    <pre><code class="language-scala" data-lang="scala"><span class="nv">collection</span><span class="o">.</span><span class="py">get</span><span class="o">(</span><span class="n">key</span><span class="o">)</span> <span class="k">match</span> <span class="o">{</span>
+  <span class="k">case</span> <span class="nc">None</span> <span class="k">=&gt;</span> <span class="o">{</span>
+    <span class="nv">tile</span><span class="o">.</span><span class="py">owner</span>
+  <span class="o">}</span>
+  <span class="c1">// Checks if collection.get(key) matches the type Some(x)</span>
+  <span class="c1">// and that the value of</span>
+  <span class="k">case</span> <span class="nc">Some</span><span class="o">(</span><span class="n">owner</span><span class="o">)</span> <span class="k">if</span> <span class="n">owner</span> <span class="o">==</span> <span class="nv">tile</span><span class="o">.</span><span class="py">owner</span> <span class="k">=&gt;</span> <span class="o">{</span>
+    <span class="n">owner</span>
+  <span class="o">}</span>
+  <span class="c1">// The underscore will always evaluate.</span>
+  <span class="k">case</span> <span class="k">_</span> <span class="k">=&gt;</span> <span class="o">{</span>
+    <span class="nc">None</span>
+  <span class="o">}</span>
+<span class="o">}</span></code></pre>
+                  </figure>
+                  <h3 id="decomposing-an-object">Decomposing an Object</h3>
+                  <p>Match statements can also decompose an object into variables for you if it matches a specific format.</p>
+                  <figure class="highlight">
+                    <pre><code class="language-scala" data-lang="scala"><span class="k">def</span> <span class="nf">move</span><span class="o">(</span><span class="n">loc</span><span class="k">:</span> <span class="kt">Int</span><span class="o">)</span> <span class="k">:</span> <span class="kt">Board</span> <span class="o">=</span> <span class="o">{</span>
+  <span class="nf">val</span> <span class="o">(</span><span class="n">front</span><span class="o">,</span> <span class="n">back</span><span class="o">)</span> <span class="k">=</span> <span class="nv">state</span><span class="o">.</span><span class="py">splitAt</span><span class="o">(</span><span class="n">loc</span><span class="o">)</span>
+
+  <span class="n">back</span> <span class="k">match</span> <span class="o">{</span>
+    <span class="k">case</span> <span class="nc">Tile</span><span class="o">(</span><span class="k">_</span><span class="o">,</span> <span class="nc">None</span><span class="o">)</span> <span class="o">::</span> <span class="n">tail</span> <span class="k">=&gt;</span> <span class="o">{</span>
+      <span class="k">val</span> <span class="nv">newState</span> <span class="k">=</span> <span class="n">front</span> <span class="o">:::</span> <span class="k">new</span> <span class="nc">Tile</span><span class="o">(</span><span class="n">loc</span><span class="o">,</span> <span class="nc">Some</span><span class="o">(</span><span class="n">nextPlayer</span><span class="o">))</span> <span class="o">::</span> <span class="n">tail</span>
+      <span class="k">new</span> <span class="nc">Board</span><span class="o">(</span><span class="n">newState</span><span class="o">,</span> <span class="n">otherPlayer</span><span class="o">)</span>
+    <span class="o">}</span>
+    <span class="k">case</span> <span class="k">_</span> <span class="k">=&gt;</span> <span class="k">throw</span> <span class="k">new</span> <span class="nc">Error</span><span class="o">(</span><span class="n">s</span><span class="s">"Invalid location $loc"</span><span class="o">)</span>
+  <span class="o">}</span>
+<span class="o">}</span></code></pre>
+                  </figure>
+                  <p>In our move method, we use a match statement to split a List into its head and its tail. Outside of a match statement the line head :: tail is appending head to the front of the List tail using the :: operator. Match is checking if your variable could be deconstructed to match this pattern.</p>
+                  <p>We check that the head, the Tile at the specified location, is empty. Then we insert a new tile. Any operator beginning with a colon is right associative. head :: tail will insert head at the front of the List tail.</p>
+                  <figure class="highlight">
+                    <pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="nv">newState</span> <span class="k">=</span> <span class="n">front</span> <span class="o">:::</span> <span class="k">new</span> <span class="nc">Tile</span><span class="o">(</span><span class="n">loc</span><span class="o">,</span> <span class="nc">Some</span><span class="o">(</span><span class="n">nextPlayer</span><span class="o">))</span> <span class="o">::</span> <span class="n">tail</span></code></pre>
+                  </figure>
+                  <p>Below is the same code refactored to show which variable is calling the method.</p>
+                  <figure class="highlight">
+                    <pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="nv">newState</span> <span class="k">=</span> <span class="o">(</span><span class="n">tail</span><span class="o">.::(</span><span class="k">new</span> <span class="nc">Tile</span><span class="o">(</span><span class="n">loc</span><span class="o">,</span> <span class="nc">Some</span><span class="o">(</span><span class="n">nextPlayer</span><span class="o">))).:::(</span><span class="n">front</span><span class="o">)</span></code></pre>
+                  </figure>
+                  <h2 id="the-problems">The Problems</h2>
+                  <p>Maybe our board should’ve been a Vector of Tiles instead of a List. Lists in Scala are linked lists. Linked lists are great if we want to have immutable collections, but it’s kind of hard to think about when it’s new to you. Vectors would’ve let us access tiles by their index and simplify code.</p>
+                  <p>For example, we need to iterate through the List to the tile’s location to check if a it is empty or not. This is only optimal if the user’s input is valid. If the input is invalid, we have to iterate through the list multiple times. If we used a Vector, we could create a separate method to check if a move is valid instead of trying to save operations by shoving the check into our move method.</p>
+                  <p>Using a Vector to check if a move is valid would fix another problem. Our game loop is recursive. Because we catch invalid input for the moves in a try catch block, it’s not tail recursive. When we call playGame, the code in the catch block could still execute. Tic tac toe has at most nine moves. If our game was more complex, we could actually cause a stack overflow.</p>
+                  <figure class="highlight">
+                    <pre><code class="language-scala" data-lang="scala"><span class="c1">// This is badly designed</span>
+<span class="k">try</span> <span class="o">{</span>
+  <span class="nv">game</span><span class="o">.</span><span class="py">nextPlayer</span> <span class="k">match</span> <span class="o">{</span>
+    <span class="k">case</span> <span class="nf">X</span><span class="o">()</span> <span class="k">=&gt;</span> <span class="nf">println</span><span class="o">(</span><span class="s">"Player 1, your move"</span><span class="o">)</span>
+    <span class="k">case</span> <span class="nf">O</span><span class="o">()</span> <span class="k">=&gt;</span> <span class="nf">println</span><span class="o">(</span><span class="s">"Player 2, your move"</span><span class="o">)</span>
+  <span class="o">}</span>
+  <span class="nf">println</span><span class="o">(</span><span class="n">s</span><span class="s">"$game\n"</span><span class="o">)</span>
+
+  <span class="k">val</span> <span class="nv">nextMove</span> <span class="k">=</span> <span class="nv">scala</span><span class="o">.</span><span class="py">io</span><span class="o">.</span><span class="py">StdIn</span><span class="o">.</span><span class="py">readInt</span><span class="o">()</span>
+
+  <span class="nf">playGame</span><span class="o">(</span><span class="nv">game</span><span class="o">.</span><span class="py">move</span><span class="o">(</span><span class="n">nextMove</span><span class="o">))</span>
+<span class="o">}</span> <span class="k">catch</span> <span class="o">{</span>
+  <span class="k">case</span> <span class="n">e</span><span class="k">:</span> <span class="kt">Throwable</span> <span class="o">=&gt;</span> <span class="o">{</span>
+    <span class="nf">println</span><span class="o">(</span><span class="n">s</span><span class="s">"Error making a move\n${e.getMessage}"</span><span class="o">)</span>
+    <span class="nf">playGame</span><span class="o">(</span><span class="n">game</span><span class="o">)</span>
+  <span class="o">}</span>
+<span class="o">}</span></code></pre>
+                  </figure>
+                  <p>Overall, I think using immutable values made things more complex. I spent most of my time writing the gameState method. I wanted to use Lists and foldLeft to build the results. If I allowed myself to use mutable values, I would have just used a for loop to check each of the rows, columns, and diagonals for a winner.</p>
+                  <figure class="highlight">
+                    <pre><code class="language-scala" data-lang="scala"><span class="c1">// Trying to force it</span>
+<span class="nf">val</span> <span class="o">(</span><span class="n">placements</span><span class="o">,</span> <span class="n">movesLeft</span><span class="o">)</span> <span class="k">=</span> <span class="nv">state</span><span class="o">.</span><span class="py">foldLeft</span><span class="o">(</span><span class="nc">Map</span><span class="o">[</span><span class="kt">String</span>, <span class="kt">Owner</span><span class="o">](),</span> <span class="mi">0</span><span class="o">)</span> <span class="o">{</span> <span class="o">(</span><span class="n">result</span><span class="o">,</span> <span class="n">tile</span><span class="o">)</span> <span class="k">=&gt;</span>
+  <span class="nf">val</span> <span class="o">(</span><span class="n">collection</span><span class="o">,</span> <span class="n">movesLeft</span><span class="o">)</span> <span class="k">=</span> <span class="n">result</span>
+
+  <span class="k">def</span> <span class="nf">newVal</span><span class="o">(</span><span class="n">key</span><span class="k">:</span> <span class="kt">String</span><span class="o">)</span> <span class="k">=</span> <span class="o">{</span>
+    <span class="nv">collection</span><span class="o">.</span><span class="py">get</span><span class="o">(</span><span class="n">key</span><span class="o">)</span> <span class="k">match</span> <span class="o">{</span>
+      <span class="k">case</span> <span class="nc">None</span> <span class="k">=&gt;</span> <span class="o">{</span>
+        <span class="nv">tile</span><span class="o">.</span><span class="py">owner</span>
+      <span class="o">}</span>
+      <span class="k">case</span> <span class="nc">Some</span><span class="o">(</span><span class="n">owner</span><span class="o">)</span> <span class="k">if</span> <span class="n">owner</span> <span class="o">==</span> <span class="nv">tile</span><span class="o">.</span><span class="py">owner</span> <span class="k">=&gt;</span> <span class="o">{</span>
+        <span class="n">owner</span>
+      <span class="o">}</span>
+      <span class="k">case</span> <span class="k">_</span> <span class="k">=&gt;</span> <span class="o">{</span>
+        <span class="nc">None</span>
+      <span class="o">}</span>
+    <span class="o">}</span>
+  <span class="o">}</span>
+
+  <span class="nf">val</span> <span class="o">(</span><span class="n">x</span><span class="o">,</span> <span class="n">y</span><span class="o">)</span> <span class="k">=</span> <span class="o">(</span><span class="nv">tile</span><span class="o">.</span><span class="py">loc</span> <span class="o">%</span> <span class="mi">3</span><span class="o">,</span> <span class="nv">tile</span><span class="o">.</span><span class="py">loc</span> <span class="o">/</span> <span class="mi">3</span><span class="o">)</span>
+
+  <span class="k">val</span> <span class="nv">rowKey</span> <span class="k">=</span> <span class="n">s</span><span class="s">"row$y"</span>
+  <span class="k">val</span> <span class="nv">rowVal</span> <span class="k">=</span> <span class="nf">newVal</span><span class="o">(</span><span class="n">rowKey</span><span class="o">)</span>
+
+  <span class="k">val</span> <span class="nv">colKey</span> <span class="k">=</span> <span class="n">s</span><span class="s">"col$x"</span>
+  <span class="k">val</span> <span class="nv">colVal</span> <span class="k">=</span> <span class="nf">newVal</span><span class="o">(</span><span class="n">colKey</span><span class="o">)</span>
+
+  <span class="k">val</span> <span class="nv">diag1Key</span> <span class="k">=</span> <span class="s">"diag1"</span>
+  <span class="k">val</span> <span class="nv">diag1Val</span> <span class="k">=</span> <span class="nf">newVal</span><span class="o">(</span><span class="n">diag1Key</span><span class="o">)</span>
+
+  <span class="k">val</span> <span class="nv">diag2Key</span> <span class="k">=</span> <span class="s">"diag2"</span>
+  <span class="k">val</span> <span class="nv">diag2Val</span> <span class="k">=</span> <span class="nf">newVal</span><span class="o">(</span><span class="n">diag2Key</span><span class="o">)</span>
+
+  <span class="k">val</span> <span class="nv">newVals</span> <span class="k">=</span> <span class="nf">if</span> <span class="o">(</span><span class="n">x</span> <span class="o">==</span> <span class="n">y</span> <span class="o">&amp;&amp;</span> <span class="n">x</span> <span class="o">+</span> <span class="n">y</span> <span class="o">==</span> <span class="mi">2</span><span class="o">)</span> <span class="o">{</span>
+    <span class="nc">Map</span><span class="o">(</span><span class="n">diag1Key</span> <span class="o">-&gt;</span> <span class="n">diag1Val</span><span class="o">,</span> <span class="n">diag2Key</span> <span class="o">-&gt;</span> <span class="n">diag2Val</span><span class="o">,</span> <span class="n">rowKey</span> <span class="o">-&gt;</span> <span class="n">rowVal</span><span class="o">,</span> <span class="n">colKey</span> <span class="o">-&gt;</span> <span class="n">colVal</span><span class="o">)</span>
+  <span class="o">}</span> <span class="k">else</span> <span class="nf">if</span> <span class="o">(</span><span class="n">x</span> <span class="o">==</span> <span class="n">y</span><span class="o">)</span> <span class="o">{</span>
+    <span class="nc">Map</span><span class="o">(</span><span class="n">diag1Key</span> <span class="o">-&gt;</span> <span class="n">diag1Val</span><span class="o">,</span> <span class="n">rowKey</span> <span class="o">-&gt;</span> <span class="n">rowVal</span><span class="o">,</span> <span class="n">colKey</span> <span class="o">-&gt;</span> <span class="n">colVal</span><span class="o">)</span>
+  <span class="o">}</span> <span class="k">else</span> <span class="nf">if</span> <span class="o">(</span><span class="n">x</span> <span class="o">+</span> <span class="n">y</span> <span class="o">==</span> <span class="mi">2</span><span class="o">)</span> <span class="o">{</span>
+    <span class="nc">Map</span><span class="o">(</span><span class="n">diag2Key</span> <span class="o">-&gt;</span> <span class="n">diag2Val</span><span class="o">,</span> <span class="n">rowKey</span> <span class="o">-&gt;</span> <span class="n">rowVal</span><span class="o">,</span> <span class="n">colKey</span> <span class="o">-&gt;</span> <span class="n">colVal</span><span class="o">)</span>
+  <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
+    <span class="nc">Map</span><span class="o">(</span><span class="n">rowKey</span> <span class="o">-&gt;</span> <span class="n">rowVal</span><span class="o">,</span> <span class="n">colKey</span> <span class="o">-&gt;</span> <span class="n">colVal</span><span class="o">)</span>
+  <span class="o">}</span>
+
+  <span class="k">val</span> <span class="nv">move</span> <span class="k">=</span> <span class="nf">if</span> <span class="o">(</span><span class="nv">tile</span><span class="o">.</span><span class="py">owner</span><span class="o">.</span><span class="py">isEmpty</span><span class="o">)</span> <span class="mi">1</span> <span class="k">else</span> <span class="mi">0</span>
+  <span class="o">(</span><span class="n">collection</span> <span class="o">++</span> <span class="n">newVals</span><span class="o">,</span> <span class="n">movesLeft</span> <span class="o">+</span> <span class="n">move</span><span class="o">)</span>
+<span class="o">}</span></code></pre>
+                  </figure>
+                  <h2 id="asides">Asides</h2>
+                  <ol>
+                    <li id="tictactoe-1-aside1">Read Evaluate Print Loop. The best parts of Ruby and Scala are testing code snippets using their REPLs. Every programming language needs one. I don't know how you can code without it.</li>
+                    <li id="tictactoe-1-aside2">
+                      Let's say you're decomposing a tuple. If you only care about one of the values, you can use the underscore to ignore the other
+                      <figure class="highlight">
+                        <pre><code class="language-scala" data-lang="scala">    <span class="c1">// We only need one value out of the tuple</span>
+    <span class="nf">val</span> <span class="o">(</span><span class="n">x</span><span class="o">,</span> <span class="k">_</span><span class="o">)</span> <span class="k">=</span> <span class="o">(</span><span class="mi">500</span><span class="o">,</span> <span class="s">"days"</span><span class="o">)</span>
+    </code></pre>
+                      </figure>
+                    </li>
+                    <li id="tictactoe-1-aside3">Outside of my tic tac toe code, which is entirely my bad code, Scala has issues. Its immutability and static typing is a huge pain when you're trying to parse JSON.</li>
+                  </ol>
+                </div>
+              </article>
+            </li>
+            <li>
+              <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+                <h1 class="post-title p-name" itemprop="name headline">
+                  <a class="post-link" href="/2016/10/13/if-youve-ever-felt-bad-because-you-couldnt-find-a-job.html">If You&#39;ve Ever Felt Bad Because You Couldn&#39;t Find a Job...</a>
+                </h1>
+                <p class="post-meta">
+                  <time class="dt-published" datetime="2016-10-13T00:13:53-05:00" itemprop="datePublished">
+                    Oct 13, 2016
+                  </time>• <span itemprop="author" itemscope itemtype="http://schema.org/Person"><span class="p-author h-card" itemprop="name">Jim</span></span></p>
+                <div class="post-content e-content" itemprop="articleBody">
+                  <p>…you should read <a href="http://danluu.com/hiring-lemons/">“Developer hiring and the market for lemons” by Dan Luu</a> about the four dumb excuses companies give for not being able to find good employees. It’ll make you feel better about how arbitrary it all is.</p>
+                </div>
+              </article>
+            </li>
+            <li>
+              <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+                <h1 class="post-title p-name" itemprop="name headline">
+                  <a class="post-link" href="/2016/03/06/apple-vs-the-fbi.html">Apple vs the FBI</a>
+                </h1>
+                <p class="post-meta">
+                  <time class="dt-published" datetime="2016-03-06T18:20:03-06:00" itemprop="datePublished">
+                    Mar 6, 2016
+                  </time>• <span itemprop="author" itemscope itemtype="http://schema.org/Person"><span class="p-author h-card" itemprop="name">Jim</span></span></p>
+                <div class="post-content e-content" itemprop="articleBody">
+                  <p>Blake Ross, Firefox wunderkind, has <a href="https://medium.com/@blakeross/mr-fart-s-favorite-colors-3177a406c775#.y0fqxnchy">the best analogy for the Apple versus the FBI debate</a>.</p>
+                  <p>There is a slim chance that there is data on a terrorist’s work phone, and the FBI wants Apple to allow a backdoor key.</p>
+                  <p>An airline pilot locks the other pilot out so he can crash the plane into a mountain, and the airlines don’t add a backdoor key to the cockpit door.</p>
+                  <p>They understand that there are too many bad people trying to get in, and it’s so rare that a good person is trying to get in that it’s not worth risking security with a backdoor key.</p>
+                  <blockquote>
+                    <p>The security we encounter every day — when it works at all — is usually built out of shades of gray: Lock your door. Need more? Arm your alarm. Even more? Don’t feed Fido for a day. Marginal benefits, marginal costs.</p>
+                    <p>It’s easy to assume that digital security is just another spectrum, and politicians love to reinforce that — gray’s their favorite color. Every presidential candidate is offering the same Michael Scott solution: Let’s preserve everyone’s security at once! Give a little here, take a little there, half-pregnancies for all.</p>
+                    <p>Unfortunately it’s not that complicated, which means it’s not that simple. Unbreakable phones are coming. We’ll have to decide who controls the cockpit: The captain? Or the cabin? Either choice has problems, but — I’m sorry, Aunt Congress — you crash if you pick 2.</p>
+                    &mdash; <a href="https://medium.com/@blakeross/mr-fart-s-favorite-colors-3177a406c775#.y0fqxnchy">Blake Ross</a>
+                  </blockquote>
+                </div>
+              </article>
+            </li>
+          </ul>
+        </div>
+        <div class="pagination">
+          <div>
+            <a href="/" class="previous">Previous</a>
+          </div>
+          <div>
+            <span class="page_number">2 of 3</span>
+          </div>
+          <div>
+            <a href="/page3" class="next">Next</a>
+          </div>
+        </div>
+      </div>
+    </main>
+  </body>
+</html>

@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="initial-scale=1, viewport-fit=cover">
+    <meta name="google-site-verification" content="w449-YRInXMviD2YBTfFdb9hs54JylYloEurwuY9-nQ" />
+    <link rel="stylesheet" href="/assets/main.css"><!-- Begin Jekyll SEO tag v2.7.1 -->
+    <title>TicTacToe.scala | Weinert Works</title>
+    <meta name="generator" content="Jekyll v4.2.1" />
+    <meta property="og:title" content="TicTacToe.scala" />
+    <meta name="author" content="Jim" />
+    <meta property="og:locale" content="en_US" />
+    <meta name="description" content="Scala finally clicked. It took a year of writing production code with it and completing Coursera’s Functional Programming Principles in Scala course (lucky me, it’s taught by the creator of Scala, Martin Odersky). When I got to the programming exercises in the Scala chapter of Seven Languages in Seven Weeks, I wanted my code to follow every Scala principle. I wanted to only use immutable variables and use functional programming components instead of for loops." />
+    <meta property="og:description" content="Scala finally clicked. It took a year of writing production code with it and completing Coursera’s Functional Programming Principles in Scala course (lucky me, it’s taught by the creator of Scala, Martin Odersky). When I got to the programming exercises in the Scala chapter of Seven Languages in Seven Weeks, I wanted my code to follow every Scala principle. I wanted to only use immutable variables and use functional programming components instead of for loops." />
+    <link rel="canonical" href="https://www.weinertworks.com/2016/10/24/tictactoe-scala.html" />
+    <meta property="og:url" content="https://www.weinertworks.com/2016/10/24/tictactoe-scala.html" />
+    <meta property="og:site_name" content="Weinert Works" />
+    <meta property="og:type" content="article" />
+    <meta property="article:published_time" content="2016-10-24T00:38:54-05:00" />
+    <meta name="twitter:card" content="summary" />
+    <meta property="twitter:title" content="TicTacToe.scala" />
+    <script type="application/ld+json">
+      {"headline":"TicTacToe.scala","dateModified":"2016-10-24T00:38:54-05:00","datePublished":"2016-10-24T00:38:54-05:00","url":"https://www.weinertworks.com/2016/10/24/tictactoe-scala.html","mainEntityOfPage":{"@type":"WebPage","@id":"https://www.weinertworks.com/2016/10/24/tictactoe-scala.html"},"author":{"@type":"Person","name":"Jim"},"@type":"BlogPosting","description":"Scala finally clicked. It took a year of writing production code with it and completing Coursera’s Functional Programming Principles in Scala course (lucky me, it’s taught by the creator of Scala, Martin Odersky). When I got to the programming exercises in the Scala chapter of Seven Languages in Seven Weeks, I wanted my code to follow every Scala principle. I wanted to only use immutable variables and use functional programming components instead of for loops.","@context":"https://schema.org"}
+    </script>
+    <!-- End Jekyll SEO tag -->
+    <link type="application/atom+xml" rel="alternate" href="https://www.weinertworks.com/feed.xml" title="Weinert Works" /></head>
+  <body>
+    <header class="site-header">
+      <div class="container">
+        <a class="site-title" href="/">Weinert Works</a>
+        <nav class="site-nav">
+          <ul>
+            <li><a class="page-link" href="/">Blog</a></li>
+            <li><a class="page-link" href="/feed.xml">RSS</a></li>
+          </ul>
+        </nav>
+      </div>
+    </header>
+    <main class="page-content container" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+          <header class="post-header">
+            <h1 class="post-title p-name" itemprop="name headline">TicTacToe.scala</h1>
+            <p class="post-meta">
+              <time class="dt-published" datetime="2016-10-24T00:38:54-05:00" itemprop="datePublished">
+                Oct 24, 2016
+              </time>• <span itemprop="author" itemscope itemtype="http://schema.org/Person"><span class="p-author h-card" itemprop="name">Jim</span></span></p>
+          </header>
+          <div class="post-content e-content" itemprop="articleBody">
+            <p>Scala finally clicked. It took a year of writing production code with it and completing Coursera’s <a href="https://www.coursera.org/learn/progfun1">Functional Programming Principles in Scala</a> course (lucky me, it’s taught by the creator of Scala, Martin Odersky). When I got to the programming exercises in the Scala chapter of <a href="https://pragprog.com/book/btlang/seven-languages-in-seven-weeks">Seven Languages in Seven Weeks</a>, I wanted my code to follow every Scala principle. I wanted to only use immutable variables and use functional programming components instead of for loops.</p>
+            <p>Here’s my tic tac toe code in its entirety. You can run it using Scala’s <a href="#tictactoe-1-aside1">REPL</a>. I didn’t want to spend an entire weekend optimizing it, so this is the first complete version. I’ll tell you <a href="#the-problems">why it sucks</a> at the later.</p>
+            <h2 id="the-code">The Code</h2>
+            <figure class="highlight">
+              <pre><code class="language-scala" data-lang="scala"><span class="k">class</span> <span class="nc">Player</span><span class="o">()</span>
+<span class="k">case</span> <span class="k">class</span> <span class="nc">X</span><span class="o">()</span> <span class="k">extends</span> <span class="nc">Player</span> <span class="o">{</span>
+  <span class="k">override</span> <span class="k">def</span> <span class="nf">toString</span><span class="o">()</span><span class="k">:</span> <span class="kt">String</span> <span class="o">=</span> <span class="o">{</span>
+    <span class="s">"X"</span>
+  <span class="o">}</span>
+<span class="o">}</span>
+<span class="k">case</span> <span class="k">class</span> <span class="nc">O</span><span class="o">()</span> <span class="k">extends</span> <span class="nc">Player</span> <span class="o">{</span>
+  <span class="k">override</span> <span class="k">def</span> <span class="nf">toString</span><span class="o">()</span><span class="k">:</span> <span class="kt">String</span> <span class="o">=</span> <span class="o">{</span>
+    <span class="s">"O"</span>
+  <span class="o">}</span>
+<span class="o">}</span>
+
+<span class="k">type</span> <span class="kt">Owner</span> <span class="o">=</span> <span class="nc">Option</span><span class="o">[</span><span class="kt">Player</span><span class="o">]</span>
+
+<span class="k">class</span> <span class="nc">Status</span><span class="o">()</span>
+<span class="k">case</span> <span class="k">class</span> <span class="nc">Winner</span><span class="o">(</span><span class="n">player</span><span class="k">:</span> <span class="kt">Player</span><span class="o">)</span> <span class="k">extends</span> <span class="nc">Status</span>
+<span class="k">case</span> <span class="k">class</span> <span class="nc">InProgress</span><span class="o">()</span> <span class="k">extends</span> <span class="nc">Status</span>
+<span class="k">case</span> <span class="k">class</span> <span class="nc">Draw</span><span class="o">()</span> <span class="k">extends</span> <span class="nc">Status</span>
+
+<span class="k">case</span> <span class="k">class</span> <span class="nc">Tile</span><span class="o">(</span><span class="n">loc</span><span class="k">:</span> <span class="kt">Int</span><span class="o">,</span> <span class="n">owner</span><span class="k">:</span> <span class="kt">Owner</span><span class="o">)</span> <span class="o">{</span>
+  <span class="k">override</span> <span class="k">def</span> <span class="nf">toString</span><span class="o">()</span><span class="k">:</span> <span class="kt">String</span> <span class="o">=</span> <span class="o">{</span>
+    <span class="n">owner</span> <span class="k">match</span> <span class="o">{</span>
+      <span class="k">case</span> <span class="nc">Some</span><span class="o">(</span><span class="n">player</span><span class="o">)</span> <span class="k">=&gt;</span> <span class="nv">player</span><span class="o">.</span><span class="py">toString</span>
+      <span class="k">case</span> <span class="k">_</span> <span class="k">=&gt;</span> <span class="n">s</span><span class="s">"$loc"</span>
+    <span class="o">}</span>
+  <span class="o">}</span>
+<span class="o">}</span>
+
+<span class="k">val</span> <span class="nv">blankState</span> <span class="k">=</span> <span class="o">(</span><span class="mi">0</span> <span class="n">to</span> <span class="mi">8</span><span class="o">).</span><span class="py">map</span><span class="o">(</span><span class="n">loc</span> <span class="k">=&gt;</span> <span class="k">new</span> <span class="nc">Tile</span><span class="o">(</span><span class="n">loc</span><span class="o">,</span> <span class="nc">None</span><span class="o">)).</span><span class="py">toList</span>
+
+<span class="k">case</span> <span class="k">class</span> <span class="nc">Board</span><span class="o">(</span><span class="n">state</span><span class="k">:</span> <span class="kt">List</span><span class="o">[</span><span class="kt">Tile</span><span class="o">]</span> <span class="k">=</span> <span class="n">blankState</span><span class="o">,</span> <span class="n">nextPlayer</span><span class="k">:</span> <span class="kt">Player</span> <span class="o">=</span> <span class="nf">X</span><span class="o">())</span> <span class="o">{</span>
+  <span class="k">def</span> <span class="nf">move</span><span class="o">(</span><span class="n">loc</span><span class="k">:</span> <span class="kt">Int</span><span class="o">)</span> <span class="k">:</span> <span class="kt">Board</span> <span class="o">=</span> <span class="o">{</span>
+    <span class="nf">val</span> <span class="o">(</span><span class="n">front</span><span class="o">,</span> <span class="n">back</span><span class="o">)</span> <span class="k">=</span> <span class="nv">state</span><span class="o">.</span><span class="py">splitAt</span><span class="o">(</span><span class="n">loc</span><span class="o">)</span>
+
+    <span class="n">back</span> <span class="k">match</span> <span class="o">{</span>
+      <span class="k">case</span> <span class="nc">Tile</span><span class="o">(</span><span class="k">_</span><span class="o">,</span> <span class="nc">None</span><span class="o">)</span> <span class="o">::</span> <span class="n">tail</span> <span class="k">=&gt;</span> <span class="o">{</span>
+        <span class="k">val</span> <span class="nv">newState</span> <span class="k">=</span> <span class="n">front</span> <span class="o">:::</span> <span class="k">new</span> <span class="nc">Tile</span><span class="o">(</span><span class="n">loc</span><span class="o">,</span> <span class="nc">Some</span><span class="o">(</span><span class="n">nextPlayer</span><span class="o">))</span> <span class="o">::</span> <span class="n">tail</span>
+        <span class="k">new</span> <span class="nc">Board</span><span class="o">(</span><span class="n">newState</span><span class="o">,</span> <span class="n">otherPlayer</span><span class="o">)</span>
+      <span class="o">}</span>
+      <span class="k">case</span> <span class="k">_</span> <span class="k">=&gt;</span> <span class="k">throw</span> <span class="k">new</span> <span class="nc">Error</span><span class="o">(</span><span class="n">s</span><span class="s">"Invalid location $loc"</span><span class="o">)</span>
+    <span class="o">}</span>
+  <span class="o">}</span>
+
+  <span class="k">def</span> <span class="nf">otherPlayer</span> <span class="k">=</span> <span class="o">{</span>
+    <span class="n">nextPlayer</span> <span class="k">match</span> <span class="o">{</span>
+      <span class="k">case</span> <span class="nf">X</span><span class="o">()</span> <span class="k">=&gt;</span> <span class="nf">O</span><span class="o">()</span>
+      <span class="k">case</span> <span class="nf">O</span><span class="o">()</span> <span class="k">=&gt;</span> <span class="nf">X</span><span class="o">()</span>
+    <span class="o">}</span>
+  <span class="o">}</span>
+
+  <span class="c1">// val (x, y) = (v % 3, v / 3)</span>
+  <span class="c1">// 0,0 | 1,0 | 2,0</span>
+  <span class="c1">// 0,1 | 1,1 | 2,1</span>
+  <span class="c1">// 0,2 | 1,2 | 2,2</span>
+  <span class="k">def</span> <span class="nf">gameState</span> <span class="k">:</span> <span class="kt">Status</span> <span class="o">=</span> <span class="o">{</span>
+    <span class="nf">val</span> <span class="o">(</span><span class="n">placements</span><span class="o">,</span> <span class="n">movesLeft</span><span class="o">)</span> <span class="k">=</span> <span class="nv">state</span><span class="o">.</span><span class="py">foldLeft</span><span class="o">(</span><span class="nc">Map</span><span class="o">[</span><span class="kt">String</span>, <span class="kt">Owner</span><span class="o">](),</span> <span class="mi">0</span><span class="o">)</span> <span class="o">{</span> <span class="o">(</span><span class="n">result</span><span class="o">,</span> <span class="n">tile</span><span class="o">)</span> <span class="k">=&gt;</span>
+      <span class="nf">val</span> <span class="o">(</span><span class="n">collection</span><span class="o">,</span> <span class="n">movesLeft</span><span class="o">)</span> <span class="k">=</span> <span class="n">result</span>
+
+      <span class="k">def</span> <span class="nf">newVal</span><span class="o">(</span><span class="n">key</span><span class="k">:</span> <span class="kt">String</span><span class="o">)</span> <span class="k">=</span> <span class="o">{</span>
+        <span class="nv">collection</span><span class="o">.</span><span class="py">get</span><span class="o">(</span><span class="n">key</span><span class="o">)</span> <span class="k">match</span> <span class="o">{</span>
+          <span class="k">case</span> <span class="nc">None</span> <span class="k">=&gt;</span> <span class="o">{</span>
+            <span class="nv">tile</span><span class="o">.</span><span class="py">owner</span>
+          <span class="o">}</span>
+          <span class="k">case</span> <span class="nc">Some</span><span class="o">(</span><span class="n">owner</span><span class="o">)</span> <span class="k">if</span> <span class="n">owner</span> <span class="o">==</span> <span class="nv">tile</span><span class="o">.</span><span class="py">owner</span> <span class="k">=&gt;</span> <span class="o">{</span>
+            <span class="n">owner</span>
+          <span class="o">}</span>
+          <span class="k">case</span> <span class="k">_</span> <span class="k">=&gt;</span> <span class="o">{</span>
+            <span class="nc">None</span>
+          <span class="o">}</span>
+        <span class="o">}</span>
+      <span class="o">}</span>
+
+      <span class="nf">val</span> <span class="o">(</span><span class="n">x</span><span class="o">,</span> <span class="n">y</span><span class="o">)</span> <span class="k">=</span> <span class="o">(</span><span class="nv">tile</span><span class="o">.</span><span class="py">loc</span> <span class="o">%</span> <span class="mi">3</span><span class="o">,</span> <span class="nv">tile</span><span class="o">.</span><span class="py">loc</span> <span class="o">/</span> <span class="mi">3</span><span class="o">)</span>
+
+      <span class="k">val</span> <span class="nv">rowKey</span> <span class="k">=</span> <span class="n">s</span><span class="s">"row$y"</span>
+      <span class="k">val</span> <span class="nv">rowVal</span> <span class="k">=</span> <span class="nf">newVal</span><span class="o">(</span><span class="n">rowKey</span><span class="o">)</span>
+
+      <span class="k">val</span> <span class="nv">colKey</span> <span class="k">=</span> <span class="n">s</span><span class="s">"col$x"</span>
+      <span class="k">val</span> <span class="nv">colVal</span> <span class="k">=</span> <span class="nf">newVal</span><span class="o">(</span><span class="n">colKey</span><span class="o">)</span>
+
+      <span class="k">val</span> <span class="nv">diag1Key</span> <span class="k">=</span> <span class="s">"diag1"</span>
+      <span class="k">val</span> <span class="nv">diag1Val</span> <span class="k">=</span> <span class="nf">newVal</span><span class="o">(</span><span class="n">diag1Key</span><span class="o">)</span>
+
+      <span class="k">val</span> <span class="nv">diag2Key</span> <span class="k">=</span> <span class="s">"diag2"</span>
+      <span class="k">val</span> <span class="nv">diag2Val</span> <span class="k">=</span> <span class="nf">newVal</span><span class="o">(</span><span class="n">diag2Key</span><span class="o">)</span>
+
+      <span class="k">val</span> <span class="nv">newVals</span> <span class="k">=</span> <span class="nf">if</span> <span class="o">(</span><span class="n">x</span> <span class="o">==</span> <span class="n">y</span> <span class="o">&amp;&amp;</span> <span class="n">x</span> <span class="o">+</span> <span class="n">y</span> <span class="o">==</span> <span class="mi">2</span><span class="o">)</span> <span class="o">{</span>
+        <span class="nc">Map</span><span class="o">(</span><span class="n">diag1Key</span> <span class="o">-&gt;</span> <span class="n">diag1Val</span><span class="o">,</span> <span class="n">diag2Key</span> <span class="o">-&gt;</span> <span class="n">diag2Val</span><span class="o">,</span> <span class="n">rowKey</span> <span class="o">-&gt;</span> <span class="n">rowVal</span><span class="o">,</span> <span class="n">colKey</span> <span class="o">-&gt;</span> <span class="n">colVal</span><span class="o">)</span>
+      <span class="o">}</span> <span class="k">else</span> <span class="nf">if</span> <span class="o">(</span><span class="n">x</span> <span class="o">==</span> <span class="n">y</span><span class="o">)</span> <span class="o">{</span>
+        <span class="nc">Map</span><span class="o">(</span><span class="n">diag1Key</span> <span class="o">-&gt;</span> <span class="n">diag1Val</span><span class="o">,</span> <span class="n">rowKey</span> <span class="o">-&gt;</span> <span class="n">rowVal</span><span class="o">,</span> <span class="n">colKey</span> <span class="o">-&gt;</span> <span class="n">colVal</span><span class="o">)</span>
+      <span class="o">}</span> <span class="k">else</span> <span class="nf">if</span> <span class="o">(</span><span class="n">x</span> <span class="o">+</span> <span class="n">y</span> <span class="o">==</span> <span class="mi">2</span><span class="o">)</span> <span class="o">{</span>
+        <span class="nc">Map</span><span class="o">(</span><span class="n">diag2Key</span> <span class="o">-&gt;</span> <span class="n">diag2Val</span><span class="o">,</span> <span class="n">rowKey</span> <span class="o">-&gt;</span> <span class="n">rowVal</span><span class="o">,</span> <span class="n">colKey</span> <span class="o">-&gt;</span> <span class="n">colVal</span><span class="o">)</span>
+      <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
+        <span class="nc">Map</span><span class="o">(</span><span class="n">rowKey</span> <span class="o">-&gt;</span> <span class="n">rowVal</span><span class="o">,</span> <span class="n">colKey</span> <span class="o">-&gt;</span> <span class="n">colVal</span><span class="o">)</span>
+      <span class="o">}</span>
+
+      <span class="k">val</span> <span class="nv">move</span> <span class="k">=</span> <span class="nf">if</span> <span class="o">(</span><span class="nv">tile</span><span class="o">.</span><span class="py">owner</span><span class="o">.</span><span class="py">isEmpty</span><span class="o">)</span> <span class="mi">1</span> <span class="k">else</span> <span class="mi">0</span>
+      <span class="o">(</span><span class="n">collection</span> <span class="o">++</span> <span class="n">newVals</span><span class="o">,</span> <span class="n">movesLeft</span> <span class="o">+</span> <span class="n">move</span><span class="o">)</span>
+    <span class="o">}</span>
+
+    <span class="k">def</span> <span class="nf">findWinner</span><span class="o">(</span><span class="n">values</span><span class="k">:</span> <span class="kt">List</span><span class="o">[</span><span class="kt">Owner</span><span class="o">])</span> <span class="k">:</span> <span class="kt">Status</span> <span class="o">=</span> <span class="n">values</span> <span class="k">match</span> <span class="o">{</span>
+      <span class="k">case</span> <span class="nc">List</span><span class="o">()</span> <span class="k">=&gt;</span> <span class="nc">InProgress</span><span class="o">()</span>
+      <span class="k">case</span> <span class="n">head</span> <span class="o">::</span> <span class="n">tail</span> <span class="k">=&gt;</span> <span class="n">head</span> <span class="k">match</span> <span class="o">{</span>
+        <span class="k">case</span> <span class="nc">Some</span><span class="o">(</span><span class="n">x</span><span class="o">)</span> <span class="k">=&gt;</span> <span class="nc">Winner</span><span class="o">(</span><span class="n">x</span><span class="o">)</span>
+        <span class="k">case</span> <span class="nc">None</span> <span class="k">=&gt;</span> <span class="nf">findWinner</span><span class="o">(</span><span class="n">tail</span><span class="o">)</span>
+      <span class="o">}</span>
+    <span class="o">}</span>
+
+    <span class="nf">if</span> <span class="o">(</span><span class="n">movesLeft</span> <span class="o">==</span> <span class="mi">0</span><span class="o">)</span> <span class="o">{</span>
+      <span class="nc">Draw</span><span class="o">()</span>
+    <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
+      <span class="nf">findWinner</span><span class="o">(</span><span class="nv">placements</span><span class="o">.</span><span class="py">values</span><span class="o">.</span><span class="py">toList</span><span class="o">)</span>
+    <span class="o">}</span>
+  <span class="o">}</span>
+
+  <span class="k">override</span> <span class="k">def</span> <span class="nf">toString</span><span class="o">()</span><span class="k">:</span> <span class="kt">String</span> <span class="o">=</span> <span class="o">{</span>
+    <span class="nv">state</span><span class="o">.</span><span class="py">grouped</span><span class="o">(</span><span class="mi">3</span><span class="o">).</span><span class="py">map</span><span class="o">(</span><span class="nv">_</span><span class="o">.</span><span class="py">mkString</span><span class="o">(</span><span class="s">"|"</span><span class="o">)).</span><span class="py">mkString</span><span class="o">(</span><span class="s">"\n"</span><span class="o">)</span>
+  <span class="o">}</span>
+<span class="o">}</span>
+
+<span class="k">def</span> <span class="nf">playGame</span><span class="o">(</span><span class="n">game</span><span class="k">:</span> <span class="kt">Board</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">Board</span><span class="o">())</span> <span class="k">:</span> <span class="kt">Unit</span> <span class="o">=</span> <span class="o">{</span>
+  <span class="nv">game</span><span class="o">.</span><span class="py">gameState</span> <span class="k">match</span> <span class="o">{</span>
+    <span class="k">case</span> <span class="nc">Winner</span><span class="o">(</span><span class="n">player</span><span class="o">)</span> <span class="k">=&gt;</span> <span class="nf">println</span><span class="o">(</span><span class="n">s</span><span class="s">"$player is victorious!\n$game"</span><span class="o">)</span>
+    <span class="k">case</span> <span class="nc">Draw</span><span class="o">()</span> <span class="k">=&gt;</span> <span class="nf">println</span><span class="o">(</span><span class="n">s</span><span class="s">"There are no moves left. It's a stupid tie.\n$game"</span><span class="o">)</span>
+    <span class="k">case</span> <span class="nc">InProgress</span><span class="o">()</span> <span class="k">=&gt;</span> <span class="o">{</span>
+      <span class="k">try</span> <span class="o">{</span>
+        <span class="nv">game</span><span class="o">.</span><span class="py">nextPlayer</span> <span class="k">match</span> <span class="o">{</span>
+          <span class="k">case</span> <span class="nf">X</span><span class="o">()</span> <span class="k">=&gt;</span> <span class="nf">println</span><span class="o">(</span><span class="s">"Player 1, your move"</span><span class="o">)</span>
+          <span class="k">case</span> <span class="nf">O</span><span class="o">()</span> <span class="k">=&gt;</span> <span class="nf">println</span><span class="o">(</span><span class="s">"Player 2, your move"</span><span class="o">)</span>
+        <span class="o">}</span>
+        <span class="nf">println</span><span class="o">(</span><span class="n">s</span><span class="s">"$game\n"</span><span class="o">)</span>
+
+        <span class="k">val</span> <span class="nv">nextMove</span> <span class="k">=</span> <span class="nv">scala</span><span class="o">.</span><span class="py">io</span><span class="o">.</span><span class="py">StdIn</span><span class="o">.</span><span class="py">readInt</span><span class="o">()</span>
+
+        <span class="nf">playGame</span><span class="o">(</span><span class="nv">game</span><span class="o">.</span><span class="py">move</span><span class="o">(</span><span class="n">nextMove</span><span class="o">))</span>
+      <span class="o">}</span> <span class="k">catch</span> <span class="o">{</span>
+        <span class="k">case</span> <span class="n">e</span><span class="k">:</span> <span class="kt">Throwable</span> <span class="o">=&gt;</span> <span class="o">{</span>
+          <span class="nf">println</span><span class="o">(</span><span class="n">s</span><span class="s">"Error making a move\n${e.getMessage}"</span><span class="o">)</span>
+          <span class="nf">playGame</span><span class="o">(</span><span class="n">game</span><span class="o">)</span>
+        <span class="o">}</span>
+      <span class="o">}</span>
+    <span class="o">}</span>
+  <span class="o">}</span>
+<span class="o">}</span>
+
+<span class="nf">playGame</span><span class="o">()</span></code></pre>
+            </figure>
+            <h2 id="the-highlights">The Highlights</h2>
+            <p>I’m pretty proud of it. It highlights the best parts of Scala which are the case classes, match statements, and decomposing an object in a match statement.</p>
+            <h3 id="case--classes">Case  Classes</h3>
+            <p>Case classes are like fancy, extendable enums. They can inherit from other classes, override default methods like toString, and have new methods. We can create a fake-enum type by having our case classes inherit from a Player base class.</p>
+            <figure class="highlight">
+              <pre><code class="language-scala" data-lang="scala"><span class="k">class</span> <span class="nc">Player</span><span class="o">()</span>
+<span class="k">case</span> <span class="k">class</span> <span class="nc">X</span><span class="o">()</span> <span class="k">extends</span> <span class="nc">Player</span>
+<span class="k">case</span> <span class="k">class</span> <span class="nc">O</span><span class="o">()</span> <span class="k">extends</span> <span class="nc">Player</span>
+
+<span class="k">val</span> <span class="nv">x1</span> <span class="k">=</span> <span class="nf">X</span><span class="o">()</span>
+<span class="k">val</span> <span class="nv">x2</span> <span class="k">=</span> <span class="nf">X</span><span class="o">()</span>
+
+<span class="c1">// true</span>
+<span class="n">x1</span> <span class="o">==</span> <span class="n">x2</span></code></pre>
+            </figure>
+            <p>Case classes can have constructor arguments. This lets us associate a value with the enum.</p>
+            <figure class="highlight">
+              <pre><code class="language-scala" data-lang="scala"><span class="k">class</span> <span class="nc">Status</span><span class="o">()</span>
+<span class="k">case</span> <span class="k">class</span> <span class="nc">Winner</span><span class="o">(</span><span class="n">player</span><span class="k">:</span> <span class="kt">Player</span><span class="o">)</span> <span class="k">extends</span> <span class="nc">Status</span>
+<span class="k">case</span> <span class="k">class</span> <span class="nc">InProgress</span><span class="o">()</span> <span class="k">extends</span> <span class="nc">Status</span>
+<span class="k">case</span> <span class="k">class</span> <span class="nc">Draw</span><span class="o">()</span> <span class="k">extends</span> <span class="nc">Status</span>
+
+<span class="k">val</span> <span class="nv">w1</span> <span class="k">=</span> <span class="nc">Winner</span><span class="o">(</span><span class="nf">X</span><span class="o">())</span>
+<span class="k">val</span> <span class="nv">w2</span> <span class="k">=</span> <span class="nc">Winner</span><span class="o">(</span><span class="nf">O</span><span class="o">())</span>
+
+<span class="c1">// false</span>
+<span class="n">w1</span> <span class="o">==</span> <span class="n">w2</span></code></pre>
+            </figure>
+            <h3 id="match-statements">Match Statements</h3>
+            <p>Match statements are like fancy switch statements. They evaluate in order and can include additional logic. In Scala the underscore is the <a href="#tictactoe-1-aside2">we don’t care character</a>. In a switch statement it will always evaluate. Because it’s always evaluated, it should always be your last case match.</p>
+            <figure class="highlight">
+              <pre><code class="language-scala" data-lang="scala"><span class="nv">collection</span><span class="o">.</span><span class="py">get</span><span class="o">(</span><span class="n">key</span><span class="o">)</span> <span class="k">match</span> <span class="o">{</span>
+  <span class="k">case</span> <span class="nc">None</span> <span class="k">=&gt;</span> <span class="o">{</span>
+    <span class="nv">tile</span><span class="o">.</span><span class="py">owner</span>
+  <span class="o">}</span>
+  <span class="c1">// Checks if collection.get(key) matches the type Some(x)</span>
+  <span class="c1">// and that the value of</span>
+  <span class="k">case</span> <span class="nc">Some</span><span class="o">(</span><span class="n">owner</span><span class="o">)</span> <span class="k">if</span> <span class="n">owner</span> <span class="o">==</span> <span class="nv">tile</span><span class="o">.</span><span class="py">owner</span> <span class="k">=&gt;</span> <span class="o">{</span>
+    <span class="n">owner</span>
+  <span class="o">}</span>
+  <span class="c1">// The underscore will always evaluate.</span>
+  <span class="k">case</span> <span class="k">_</span> <span class="k">=&gt;</span> <span class="o">{</span>
+    <span class="nc">None</span>
+  <span class="o">}</span>
+<span class="o">}</span></code></pre>
+            </figure>
+            <h3 id="decomposing-an-object">Decomposing an Object</h3>
+            <p>Match statements can also decompose an object into variables for you if it matches a specific format.</p>
+            <figure class="highlight">
+              <pre><code class="language-scala" data-lang="scala"><span class="k">def</span> <span class="nf">move</span><span class="o">(</span><span class="n">loc</span><span class="k">:</span> <span class="kt">Int</span><span class="o">)</span> <span class="k">:</span> <span class="kt">Board</span> <span class="o">=</span> <span class="o">{</span>
+  <span class="nf">val</span> <span class="o">(</span><span class="n">front</span><span class="o">,</span> <span class="n">back</span><span class="o">)</span> <span class="k">=</span> <span class="nv">state</span><span class="o">.</span><span class="py">splitAt</span><span class="o">(</span><span class="n">loc</span><span class="o">)</span>
+
+  <span class="n">back</span> <span class="k">match</span> <span class="o">{</span>
+    <span class="k">case</span> <span class="nc">Tile</span><span class="o">(</span><span class="k">_</span><span class="o">,</span> <span class="nc">None</span><span class="o">)</span> <span class="o">::</span> <span class="n">tail</span> <span class="k">=&gt;</span> <span class="o">{</span>
+      <span class="k">val</span> <span class="nv">newState</span> <span class="k">=</span> <span class="n">front</span> <span class="o">:::</span> <span class="k">new</span> <span class="nc">Tile</span><span class="o">(</span><span class="n">loc</span><span class="o">,</span> <span class="nc">Some</span><span class="o">(</span><span class="n">nextPlayer</span><span class="o">))</span> <span class="o">::</span> <span class="n">tail</span>
+      <span class="k">new</span> <span class="nc">Board</span><span class="o">(</span><span class="n">newState</span><span class="o">,</span> <span class="n">otherPlayer</span><span class="o">)</span>
+    <span class="o">}</span>
+    <span class="k">case</span> <span class="k">_</span> <span class="k">=&gt;</span> <span class="k">throw</span> <span class="k">new</span> <span class="nc">Error</span><span class="o">(</span><span class="n">s</span><span class="s">"Invalid location $loc"</span><span class="o">)</span>
+  <span class="o">}</span>
+<span class="o">}</span></code></pre>
+            </figure>
+            <p>In our move method, we use a match statement to split a List into its head and its tail. Outside of a match statement the line head :: tail is appending head to the front of the List tail using the :: operator. Match is checking if your variable could be deconstructed to match this pattern.</p>
+            <p>We check that the head, the Tile at the specified location, is empty. Then we insert a new tile. Any operator beginning with a colon is right associative. head :: tail will insert head at the front of the List tail.</p>
+            <figure class="highlight">
+              <pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="nv">newState</span> <span class="k">=</span> <span class="n">front</span> <span class="o">:::</span> <span class="k">new</span> <span class="nc">Tile</span><span class="o">(</span><span class="n">loc</span><span class="o">,</span> <span class="nc">Some</span><span class="o">(</span><span class="n">nextPlayer</span><span class="o">))</span> <span class="o">::</span> <span class="n">tail</span></code></pre>
+            </figure>
+            <p>Below is the same code refactored to show which variable is calling the method.</p>
+            <figure class="highlight">
+              <pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="nv">newState</span> <span class="k">=</span> <span class="o">(</span><span class="n">tail</span><span class="o">.::(</span><span class="k">new</span> <span class="nc">Tile</span><span class="o">(</span><span class="n">loc</span><span class="o">,</span> <span class="nc">Some</span><span class="o">(</span><span class="n">nextPlayer</span><span class="o">))).:::(</span><span class="n">front</span><span class="o">)</span></code></pre>
+            </figure>
+            <h2 id="the-problems">The Problems</h2>
+            <p>Maybe our board should’ve been a Vector of Tiles instead of a List. Lists in Scala are linked lists. Linked lists are great if we want to have immutable collections, but it’s kind of hard to think about when it’s new to you. Vectors would’ve let us access tiles by their index and simplify code.</p>
+            <p>For example, we need to iterate through the List to the tile’s location to check if a it is empty or not. This is only optimal if the user’s input is valid. If the input is invalid, we have to iterate through the list multiple times. If we used a Vector, we could create a separate method to check if a move is valid instead of trying to save operations by shoving the check into our move method.</p>
+            <p>Using a Vector to check if a move is valid would fix another problem. Our game loop is recursive. Because we catch invalid input for the moves in a try catch block, it’s not tail recursive. When we call playGame, the code in the catch block could still execute. Tic tac toe has at most nine moves. If our game was more complex, we could actually cause a stack overflow.</p>
+            <figure class="highlight">
+              <pre><code class="language-scala" data-lang="scala"><span class="c1">// This is badly designed</span>
+<span class="k">try</span> <span class="o">{</span>
+  <span class="nv">game</span><span class="o">.</span><span class="py">nextPlayer</span> <span class="k">match</span> <span class="o">{</span>
+    <span class="k">case</span> <span class="nf">X</span><span class="o">()</span> <span class="k">=&gt;</span> <span class="nf">println</span><span class="o">(</span><span class="s">"Player 1, your move"</span><span class="o">)</span>
+    <span class="k">case</span> <span class="nf">O</span><span class="o">()</span> <span class="k">=&gt;</span> <span class="nf">println</span><span class="o">(</span><span class="s">"Player 2, your move"</span><span class="o">)</span>
+  <span class="o">}</span>
+  <span class="nf">println</span><span class="o">(</span><span class="n">s</span><span class="s">"$game\n"</span><span class="o">)</span>
+
+  <span class="k">val</span> <span class="nv">nextMove</span> <span class="k">=</span> <span class="nv">scala</span><span class="o">.</span><span class="py">io</span><span class="o">.</span><span class="py">StdIn</span><span class="o">.</span><span class="py">readInt</span><span class="o">()</span>
+
+  <span class="nf">playGame</span><span class="o">(</span><span class="nv">game</span><span class="o">.</span><span class="py">move</span><span class="o">(</span><span class="n">nextMove</span><span class="o">))</span>
+<span class="o">}</span> <span class="k">catch</span> <span class="o">{</span>
+  <span class="k">case</span> <span class="n">e</span><span class="k">:</span> <span class="kt">Throwable</span> <span class="o">=&gt;</span> <span class="o">{</span>
+    <span class="nf">println</span><span class="o">(</span><span class="n">s</span><span class="s">"Error making a move\n${e.getMessage}"</span><span class="o">)</span>
+    <span class="nf">playGame</span><span class="o">(</span><span class="n">game</span><span class="o">)</span>
+  <span class="o">}</span>
+<span class="o">}</span></code></pre>
+            </figure>
+            <p>Overall, I think using immutable values made things more complex. I spent most of my time writing the gameState method. I wanted to use Lists and foldLeft to build the results. If I allowed myself to use mutable values, I would have just used a for loop to check each of the rows, columns, and diagonals for a winner.</p>
+            <figure class="highlight">
+              <pre><code class="language-scala" data-lang="scala"><span class="c1">// Trying to force it</span>
+<span class="nf">val</span> <span class="o">(</span><span class="n">placements</span><span class="o">,</span> <span class="n">movesLeft</span><span class="o">)</span> <span class="k">=</span> <span class="nv">state</span><span class="o">.</span><span class="py">foldLeft</span><span class="o">(</span><span class="nc">Map</span><span class="o">[</span><span class="kt">String</span>, <span class="kt">Owner</span><span class="o">](),</span> <span class="mi">0</span><span class="o">)</span> <span class="o">{</span> <span class="o">(</span><span class="n">result</span><span class="o">,</span> <span class="n">tile</span><span class="o">)</span> <span class="k">=&gt;</span>
+  <span class="nf">val</span> <span class="o">(</span><span class="n">collection</span><span class="o">,</span> <span class="n">movesLeft</span><span class="o">)</span> <span class="k">=</span> <span class="n">result</span>
+
+  <span class="k">def</span> <span class="nf">newVal</span><span class="o">(</span><span class="n">key</span><span class="k">:</span> <span class="kt">String</span><span class="o">)</span> <span class="k">=</span> <span class="o">{</span>
+    <span class="nv">collection</span><span class="o">.</span><span class="py">get</span><span class="o">(</span><span class="n">key</span><span class="o">)</span> <span class="k">match</span> <span class="o">{</span>
+      <span class="k">case</span> <span class="nc">None</span> <span class="k">=&gt;</span> <span class="o">{</span>
+        <span class="nv">tile</span><span class="o">.</span><span class="py">owner</span>
+      <span class="o">}</span>
+      <span class="k">case</span> <span class="nc">Some</span><span class="o">(</span><span class="n">owner</span><span class="o">)</span> <span class="k">if</span> <span class="n">owner</span> <span class="o">==</span> <span class="nv">tile</span><span class="o">.</span><span class="py">owner</span> <span class="k">=&gt;</span> <span class="o">{</span>
+        <span class="n">owner</span>
+      <span class="o">}</span>
+      <span class="k">case</span> <span class="k">_</span> <span class="k">=&gt;</span> <span class="o">{</span>
+        <span class="nc">None</span>
+      <span class="o">}</span>
+    <span class="o">}</span>
+  <span class="o">}</span>
+
+  <span class="nf">val</span> <span class="o">(</span><span class="n">x</span><span class="o">,</span> <span class="n">y</span><span class="o">)</span> <span class="k">=</span> <span class="o">(</span><span class="nv">tile</span><span class="o">.</span><span class="py">loc</span> <span class="o">%</span> <span class="mi">3</span><span class="o">,</span> <span class="nv">tile</span><span class="o">.</span><span class="py">loc</span> <span class="o">/</span> <span class="mi">3</span><span class="o">)</span>
+
+  <span class="k">val</span> <span class="nv">rowKey</span> <span class="k">=</span> <span class="n">s</span><span class="s">"row$y"</span>
+  <span class="k">val</span> <span class="nv">rowVal</span> <span class="k">=</span> <span class="nf">newVal</span><span class="o">(</span><span class="n">rowKey</span><span class="o">)</span>
+
+  <span class="k">val</span> <span class="nv">colKey</span> <span class="k">=</span> <span class="n">s</span><span class="s">"col$x"</span>
+  <span class="k">val</span> <span class="nv">colVal</span> <span class="k">=</span> <span class="nf">newVal</span><span class="o">(</span><span class="n">colKey</span><span class="o">)</span>
+
+  <span class="k">val</span> <span class="nv">diag1Key</span> <span class="k">=</span> <span class="s">"diag1"</span>
+  <span class="k">val</span> <span class="nv">diag1Val</span> <span class="k">=</span> <span class="nf">newVal</span><span class="o">(</span><span class="n">diag1Key</span><span class="o">)</span>
+
+  <span class="k">val</span> <span class="nv">diag2Key</span> <span class="k">=</span> <span class="s">"diag2"</span>
+  <span class="k">val</span> <span class="nv">diag2Val</span> <span class="k">=</span> <span class="nf">newVal</span><span class="o">(</span><span class="n">diag2Key</span><span class="o">)</span>
+
+  <span class="k">val</span> <span class="nv">newVals</span> <span class="k">=</span> <span class="nf">if</span> <span class="o">(</span><span class="n">x</span> <span class="o">==</span> <span class="n">y</span> <span class="o">&amp;&amp;</span> <span class="n">x</span> <span class="o">+</span> <span class="n">y</span> <span class="o">==</span> <span class="mi">2</span><span class="o">)</span> <span class="o">{</span>
+    <span class="nc">Map</span><span class="o">(</span><span class="n">diag1Key</span> <span class="o">-&gt;</span> <span class="n">diag1Val</span><span class="o">,</span> <span class="n">diag2Key</span> <span class="o">-&gt;</span> <span class="n">diag2Val</span><span class="o">,</span> <span class="n">rowKey</span> <span class="o">-&gt;</span> <span class="n">rowVal</span><span class="o">,</span> <span class="n">colKey</span> <span class="o">-&gt;</span> <span class="n">colVal</span><span class="o">)</span>
+  <span class="o">}</span> <span class="k">else</span> <span class="nf">if</span> <span class="o">(</span><span class="n">x</span> <span class="o">==</span> <span class="n">y</span><span class="o">)</span> <span class="o">{</span>
+    <span class="nc">Map</span><span class="o">(</span><span class="n">diag1Key</span> <span class="o">-&gt;</span> <span class="n">diag1Val</span><span class="o">,</span> <span class="n">rowKey</span> <span class="o">-&gt;</span> <span class="n">rowVal</span><span class="o">,</span> <span class="n">colKey</span> <span class="o">-&gt;</span> <span class="n">colVal</span><span class="o">)</span>
+  <span class="o">}</span> <span class="k">else</span> <span class="nf">if</span> <span class="o">(</span><span class="n">x</span> <span class="o">+</span> <span class="n">y</span> <span class="o">==</span> <span class="mi">2</span><span class="o">)</span> <span class="o">{</span>
+    <span class="nc">Map</span><span class="o">(</span><span class="n">diag2Key</span> <span class="o">-&gt;</span> <span class="n">diag2Val</span><span class="o">,</span> <span class="n">rowKey</span> <span class="o">-&gt;</span> <span class="n">rowVal</span><span class="o">,</span> <span class="n">colKey</span> <span class="o">-&gt;</span> <span class="n">colVal</span><span class="o">)</span>
+  <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
+    <span class="nc">Map</span><span class="o">(</span><span class="n">rowKey</span> <span class="o">-&gt;</span> <span class="n">rowVal</span><span class="o">,</span> <span class="n">colKey</span> <span class="o">-&gt;</span> <span class="n">colVal</span><span class="o">)</span>
+  <span class="o">}</span>
+
+  <span class="k">val</span> <span class="nv">move</span> <span class="k">=</span> <span class="nf">if</span> <span class="o">(</span><span class="nv">tile</span><span class="o">.</span><span class="py">owner</span><span class="o">.</span><span class="py">isEmpty</span><span class="o">)</span> <span class="mi">1</span> <span class="k">else</span> <span class="mi">0</span>
+  <span class="o">(</span><span class="n">collection</span> <span class="o">++</span> <span class="n">newVals</span><span class="o">,</span> <span class="n">movesLeft</span> <span class="o">+</span> <span class="n">move</span><span class="o">)</span>
+<span class="o">}</span></code></pre>
+            </figure>
+            <h2 id="asides">Asides</h2>
+            <ol>
+              <li id="tictactoe-1-aside1">Read Evaluate Print Loop. The best parts of Ruby and Scala are testing code snippets using their REPLs. Every programming language needs one. I don't know how you can code without it.</li>
+              <li id="tictactoe-1-aside2">
+                Let's say you're decomposing a tuple. If you only care about one of the values, you can use the underscore to ignore the other
+                <figure class="highlight">
+                  <pre><code class="language-scala" data-lang="scala">    <span class="c1">// We only need one value out of the tuple</span>
+    <span class="nf">val</span> <span class="o">(</span><span class="n">x</span><span class="o">,</span> <span class="k">_</span><span class="o">)</span> <span class="k">=</span> <span class="o">(</span><span class="mi">500</span><span class="o">,</span> <span class="s">"days"</span><span class="o">)</span>
+    </code></pre>
+                </figure>
+              </li>
+              <li id="tictactoe-1-aside3">Outside of my tic tac toe code, which is entirely my bad code, Scala has issues. Its immutability and static typing is a huge pain when you're trying to parse JSON.</li>
+            </ol>
+          </div>
+          <a class="u-url" href="/2016/10/24/tictactoe-scala.html" hidden></a>
+        </article>
+      </div>
+    </main>
+  </body>
+</html>

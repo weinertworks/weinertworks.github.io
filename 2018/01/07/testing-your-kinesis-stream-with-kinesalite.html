@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="initial-scale=1, viewport-fit=cover">
+    <meta name="google-site-verification" content="w449-YRInXMviD2YBTfFdb9hs54JylYloEurwuY9-nQ" />
+    <link rel="stylesheet" href="/assets/main.css"><!-- Begin Jekyll SEO tag v2.7.1 -->
+    <title>Testing Your Kinesis Stream With Kinesalite | Weinert Works</title>
+    <meta name="generator" content="Jekyll v4.2.1" />
+    <meta property="og:title" content="Testing Your Kinesis Stream With Kinesalite" />
+    <meta name="author" content="Jim" />
+    <meta property="og:locale" content="en_US" />
+    <meta name="description" content="Resources" />
+    <meta property="og:description" content="Resources" />
+    <link rel="canonical" href="https://www.weinertworks.com/2018/01/07/testing-your-kinesis-stream-with-kinesalite.html" />
+    <meta property="og:url" content="https://www.weinertworks.com/2018/01/07/testing-your-kinesis-stream-with-kinesalite.html" />
+    <meta property="og:site_name" content="Weinert Works" />
+    <meta property="og:type" content="article" />
+    <meta property="article:published_time" content="2018-01-07T14:13:16-06:00" />
+    <meta name="twitter:card" content="summary" />
+    <meta property="twitter:title" content="Testing Your Kinesis Stream With Kinesalite" />
+    <script type="application/ld+json">
+      {"headline":"Testing Your Kinesis Stream With Kinesalite","dateModified":"2018-01-07T14:13:16-06:00","datePublished":"2018-01-07T14:13:16-06:00","url":"https://www.weinertworks.com/2018/01/07/testing-your-kinesis-stream-with-kinesalite.html","mainEntityOfPage":{"@type":"WebPage","@id":"https://www.weinertworks.com/2018/01/07/testing-your-kinesis-stream-with-kinesalite.html"},"author":{"@type":"Person","name":"Jim"},"@type":"BlogPosting","description":"Resources","@context":"https://schema.org"}
+    </script>
+    <!-- End Jekyll SEO tag -->
+    <link type="application/atom+xml" rel="alternate" href="https://www.weinertworks.com/feed.xml" title="Weinert Works" /></head>
+  <body>
+    <header class="site-header">
+      <div class="container">
+        <a class="site-title" href="/">Weinert Works</a>
+        <nav class="site-nav">
+          <ul>
+            <li><a class="page-link" href="/">Blog</a></li>
+            <li><a class="page-link" href="/feed.xml">RSS</a></li>
+          </ul>
+        </nav>
+      </div>
+    </header>
+    <main class="page-content container" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+          <header class="post-header">
+            <h1 class="post-title p-name" itemprop="name headline">Testing Your Kinesis Stream With Kinesalite</h1>
+            <p class="post-meta">
+              <time class="dt-published" datetime="2018-01-07T14:13:16-06:00" itemprop="datePublished">
+                Jan 7, 2018
+              </time>• <span itemprop="author" itemscope itemtype="http://schema.org/Person"><span class="p-author h-card" itemprop="name">Jim</span></span></p>
+          </header>
+          <div class="post-content e-content" itemprop="articleBody">
+            <h2 id="resources">Resources</h2>
+            <ol>
+              <li><a href="https://github.com/mhart/kinesalite">Kinesalite</a></li>
+              <li><a href="http://www.gdks.co.uk/kinesalite">Getting started with Kinesalite by Gavin Stewart</a> - Gavin’s guide gave me the first clues that I needed to make this work</li>
+              <li><a href="https://doc.akka.io/docs/akka/current/stream/stream-integrations.html#integrating-with-actors">Akka Stream Source.actorRef</a></li>
+              <li><a href="https://developer.lightbend.com/docs/alpakka/current/kinesis.html">Akka Alpakka AWS Kinesis Connector</a></li>
+              <li><a href="https://docs.aws.amazon.com/cli/latest/reference/kinesis/index.html">awscli kinesis commands</a></li>
+            </ol>
+            <p>At work I need to move an application to Kubernetes, but some of its logs are necessary for user usage data and tracking ad impressions. Setting up rolling logging from our container to AWS S3 looked more complicated and risky than <a href="#testing-kinesis-aside1">our current setup</a>, so we didn’t even investigate it. Other applications at the company use Amazon AWS Kinesis. It made sense to do the same. I wrote a code snippet to push log messages to Kinesis via an Akka Stream. I could get everything working in the REPL except for the part that pushes to Kinesis.</p>
+            <p>I tried to use <a href="https://github.com/mhart/kinesalite">kinesalite</a>, an application which implements AWS Kinesis, but there aren’t any guides for getting it up and running. I assumed you would just start kinesalite, point your Kinesis endpoint at localhost with the right port, and it would just work. I did that, and nothing happened. No error messages, no kinesalite log messages, nothing.</p>
+            <p>It took way too long (two days) to figure out how to write to kinesalite by….</p>
+            <h2 id="writing-to-kinesis">Writing to Kinesis</h2>
+            <p>Below is my example code to write to Kinesis. It creates an Akka Stream to which you can send messages. I tested each part of the Akka Stream in the Scala REPL.</p>
+            <figure class="highlight">
+              <pre><code class="language-scala" data-lang="scala"><span class="k">import</span> <span class="nn">scala.concurrent.duration._</span>
+
+<span class="k">import</span> <span class="nn">akka.actor.ActorSystem</span>
+<span class="k">import</span> <span class="nn">akka.stream.</span><span class="o">{</span><span class="nc">ActorMaterializer</span><span class="o">,</span> <span class="nc">Materializer</span><span class="o">}</span>
+<span class="k">import</span> <span class="nn">akka.stream.OverflowStrategy.fail</span>
+<span class="k">import</span> <span class="nn">akka.stream.alpakka.kinesis.KinesisFlowSettings</span>
+<span class="k">import</span> <span class="nn">akka.stream.alpakka.kinesis.scaladsl._</span>
+<span class="k">import</span> <span class="nn">akka.stream.scaladsl.Source</span>
+<span class="k">import</span> <span class="nn">akka.stream.scaladsl.</span><span class="o">{</span><span class="nc">Sink</span><span class="o">,</span> <span class="nc">Flow</span><span class="o">}</span>
+<span class="k">import</span> <span class="nn">akka.util.ByteString</span>
+<span class="k">import</span> <span class="nn">com.amazonaws.client.builder.AwsClientBuilder.EndpointConfiguration</span>
+<span class="k">import</span> <span class="nn">com.amazonaws.services.kinesis.AmazonKinesisAsync</span>
+<span class="k">import</span> <span class="nn">com.amazonaws.services.kinesis.AmazonKinesisAsyncClientBuilder</span>
+<span class="k">import</span> <span class="nn">com.amazonaws.services.kinesis.model.PutRecordsRequestEntry</span>
+
+<span class="k">implicit</span> <span class="k">val</span> <span class="nv">system</span><span class="k">:</span> <span class="kt">ActorSystem</span> <span class="o">=</span> <span class="nc">ActorSystem</span><span class="o">(</span><span class="s">"TestActor"</span><span class="o">)</span>
+<span class="k">implicit</span> <span class="k">val</span> <span class="nv">materializer</span><span class="k">:</span> <span class="kt">Materializer</span> <span class="o">=</span> <span class="nc">ActorMaterializer</span><span class="o">()</span>
+
+<span class="c1">// Create a Kinesis endpoint pointed at our local kinesalite</span>
+<span class="k">val</span> <span class="nv">endpoint</span> <span class="k">=</span> <span class="k">new</span> <span class="nc">EndpointConfiguration</span><span class="o">(</span><span class="s">"http://localhost:4567"</span><span class="o">,</span> <span class="s">"us-east-1"</span><span class="o">)</span>
+
+<span class="k">implicit</span> <span class="k">val</span> <span class="nv">amazonKinesisAsync</span><span class="k">:</span> <span class="kt">AmazonKinesisAsync</span> <span class="o">=</span> <span class="nv">AmazonKinesisAsyncClientBuilder</span><span class="o">.</span><span class="py">standard</span><span class="o">().</span><span class="py">withEndpointConfiguration</span><span class="o">(</span><span class="n">endpoint</span><span class="o">).</span><span class="py">build</span><span class="o">()</span>
+
+<span class="c1">// From the Akka Alpakka example</span>
+<span class="k">val</span> <span class="nv">flowSettings</span> <span class="k">=</span> <span class="nc">KinesisFlowSettings</span><span class="o">(</span><span class="n">parallelism</span> <span class="k">=</span> <span class="mi">1</span><span class="o">,</span>
+    <span class="n">maxBatchSize</span> <span class="k">=</span> <span class="mi">500</span><span class="o">,</span>
+    <span class="n">maxRecordsPerSecond</span> <span class="k">=</span> <span class="mi">1000</span><span class="o">,</span>
+    <span class="n">maxBytesPerSecond</span> <span class="k">=</span> <span class="mi">1000000</span><span class="o">,</span>
+    <span class="n">maxRetries</span> <span class="k">=</span> <span class="mi">5</span><span class="o">,</span>
+    <span class="n">backoffStrategy</span> <span class="k">=</span> <span class="nv">KinesisFlowSettings</span><span class="o">.</span><span class="py">Exponential</span><span class="o">,</span>
+    <span class="n">retryInitialTimeout</span> <span class="k">=</span> <span class="mi">100</span> <span class="n">millis</span>
+  <span class="o">)</span>
+
+<span class="k">val</span> <span class="nv">streamName</span> <span class="k">=</span> <span class="s">"myStreamName"</span>
+<span class="k">val</span> <span class="nv">partitionKey</span> <span class="k">=</span> <span class="s">"logs"</span>
+
+<span class="k">val</span> <span class="nv">loggingActor</span> <span class="k">=</span> <span class="nv">Source</span><span class="o">.</span><span class="py">actorRef</span><span class="o">[</span><span class="kt">String</span><span class="o">](</span><span class="nv">Int</span><span class="o">.</span><span class="py">MaxValue</span><span class="o">,</span> <span class="n">fail</span><span class="o">)</span>
+    <span class="o">.</span><span class="py">map</span><span class="o">(</span><span class="n">log</span> <span class="k">=&gt;</span> <span class="nc">ByteString</span><span class="o">(</span><span class="n">log</span><span class="o">).</span><span class="py">toByteBuffer</span><span class="o">)</span>
+    <span class="o">.</span><span class="py">map</span><span class="o">(</span><span class="n">data</span> <span class="k">=&gt;</span> <span class="k">new</span> <span class="nc">PutRecordsRequestEntry</span><span class="o">().</span><span class="py">withData</span><span class="o">(</span><span class="n">data</span><span class="o">).</span><span class="py">withPartitionKey</span><span class="o">(</span><span class="n">partitionKey</span><span class="o">))</span>
+    <span class="o">.</span><span class="py">to</span><span class="o">(</span><span class="nc">KinesisSink</span><span class="o">(</span><span class="n">streamName</span><span class="o">,</span> <span class="n">flowSettings</span><span class="o">))</span>
+    <span class="o">.</span><span class="py">run</span><span class="o">()</span>
+
+<span class="n">loggingActor</span> <span class="o">!</span> <span class="s">"testing this thing"</span>
+<span class="n">loggingActor</span> <span class="o">!</span> <span class="s">"test test"</span></code></pre>
+            </figure>
+            <h2 id="setting-fake-aws-credentials">Setting Fake AWS Credentials</h2>
+            <p>Either the AWS Java SDK requires credentials (my bet) or Kinesalite requires credentials even though it doesn’t care what those credentials are. Create a $HOME/.aws/credentials file with the below contents.</p>
+            <figure class="highlight">
+              <pre><code class="language-shell" data-lang="shell"><span class="o">[</span>default]
+aws_access_key_id <span class="o">=</span> x
+aws_secret_access_key <span class="o">=</span> x
+region <span class="o">=</span> us-east-1</code></pre>
+            </figure>
+            <p>This was the last step I completed to get Kinesalite working. Neither the AWS Java SDK or Kinesalite showed a single error message when trying to connect to Kinesis without authentication credentials.</p>
+            <h2 id="install-the-aws-cli-tool">Install the AWS CLI Tool</h2>
+            <p>You need this to setup Kinesalite.</p>
+            <figure class="highlight">
+              <pre><code class="language-shell" data-lang="shell">// pip3 <span class="k">if </span>you<span class="s1">'re using Python 3 or just pip if it'</span>s properly aliased
+pip2 <span class="nb">install </span>awscli</code></pre>
+            </figure>
+            <h2 id="creating-your-stream">Creating Your Stream</h2>
+            <p>I didn’t know you had to do this. Ops created our staging and production streams. I expected Kinesalite to accept requests for any stream, but I guess it behaves exactly like AWS Kinesis.</p>
+            <p>Run the AWS CLI tool with the following parameters. It is super sensitive to typos. I copied and pasted from examples without any noticeable spelling errors. The only messages it will give is something like “–stream-name is requires”</p>
+            <figure class="highlight">
+              <pre><code class="language-shell" data-lang="shell"><span class="nv">AWS_ACCESS_KEY_ID</span><span class="o">=</span>x <span class="nv">AWS_SECRET_ACCESS_KEY</span><span class="o">=</span>x aws <span class="nt">--endpoint-url</span> http://localhost:4567/ kinesis create-stream <span class="nt">--stream-name</span><span class="o">=</span>myStreamName <span class="nt">--shard-count</span><span class="o">=</span>1 –-no-verify-ssl
+<span class="nv">AWS_ACCESS_KEY_ID</span><span class="o">=</span>x <span class="nv">AWS_SECRET_ACCESS_KEY</span><span class="o">=</span>x aws <span class="nt">--endpoint-url</span> http://localhost:4567/ kinesis list-streams</code></pre>
+            </figure>
+            <p>The first command creates your stream. The second command lists all existing streams.</p>
+            <h2 id="send-messages-to-kinesis">Send Messages to Kinesis</h2>
+            <p>In your REPL, send something to Kinesis.</p>
+            <figure class="highlight">
+              <pre><code class="language-scala" data-lang="scala"><span class="n">loggingActor</span> <span class="o">!</span> <span class="s">"testing this thing"</span>
+<span class="n">loggingActor</span> <span class="o">!</span> <span class="s">"test test"</span></code></pre>
+            </figure>
+            <h2 id="verifying-the-output">Verifying the Output</h2>
+            <p>Two parts to reading what has been pushed to Kinesis. First you need to find the shard iterator to read data from the stream.</p>
+            <figure class="highlight">
+              <pre><code class="language-shell" data-lang="shell"><span class="nv">AWS_ACCESS_KEY_ID</span><span class="o">=</span>x <span class="nv">AWS_SECRET_ACCESS_KEY</span><span class="o">=</span>x aws <span class="nt">--endpoint-url</span> http://localhost:4567/ kinesis list-streams
+<span class="nv">AWS_ACCESS_KEY_ID</span><span class="o">=</span>x <span class="nv">AWS_SECRET_ACCESS_KEY</span><span class="o">=</span>x aws <span class="nt">--endpoint-url</span> http://localhost:4567/ kinesis describe-stream <span class="nt">--stream-name</span> myStreamName</code></pre>
+            </figure>
+            <p>Once you have the shard iterator, you can read all of the records since that iterator. Replace the –shard-iterator with the one in your output.</p>
+            <figure class="highlight">
+              <pre><code class="language-shell" data-lang="shell"><span class="nv">AWS_ACCESS_KEY_ID</span><span class="o">=</span>x <span class="nv">AWS_SECRET_ACCESS_KEY</span><span class="o">=</span>x aws <span class="nt">--endpoint-url</span> http://localhost:4567/ kinesis get-records <span class="nt">--shard-iterator</span> AAAAA+somekeyvalues</code></pre>
+            </figure>
+            <p>Your record is a base64 encoded string. The following scala snippet will decode it back to what you pushed to Kinesis.</p>
+            <figure class="highlight">
+              <pre><code class="language-scala" data-lang="scala"><span class="k">import</span> <span class="nn">java.util.Base64</span>
+
+<span class="k">def</span> <span class="nf">decode</span><span class="o">(</span><span class="n">str</span><span class="k">:</span> <span class="kt">String</span><span class="o">)</span><span class="k">:</span> <span class="kt">String</span> <span class="o">=</span> <span class="o">{</span>
+  <span class="nv">Base64</span><span class="o">.</span><span class="py">getDecoder</span><span class="o">.</span><span class="py">decode</span><span class="o">(</span><span class="n">str</span><span class="o">).</span><span class="py">map</span><span class="o">(</span><span class="nv">_</span><span class="o">.</span><span class="py">toChar</span><span class="o">).</span><span class="py">mkString</span>
+<span class="o">}</span></code></pre>
+            </figure>
+            <h2 id="sidenote-keep-your-libraries-up-to-date">Sidenote: Keep Your Libraries up to Date</h2>
+            <p>Sending a Kinesis request for every log message is inefficient. There’s an Akka Flow called groupedWithin that lets you batch your requests by either a number of elements or a timeout. If you don’t reach the element limit within your timeout, groupedWithin will flush your batch. Even better there is <a href="https://doc.akka.io/docs/akka/current/stream/stages-overview.html?language=scala#groupedweightedwithin">groupedWeightedWithin</a> which lets you specify a weight. Kinesis has a 1MB limit for its payloads, so we can batch our requests until we get close to 1000000 bytes.</p>
+            <p>We can’t use groupedWeightedWithin. Our application is still running on the Spray web framework. The latest Akka it supports is 2.4. The groupedWeightedWithin function wasn’t introduced until Akka 2.5.1. We’ll have to wait until we upgrade our application to Akka HTTP before we can use it.</p>
+            <p>If we kept our libraries up to date, we would have access to groupedWeightedWithin.</p>
+            <h2 id="asides">Asides</h2>
+            <ol>
+              <li id="testing-kinesis-aside1">Our current log roller was written by someone who doesn't work here anymore, and it's not dependable at all. It's based on <a href="https://logback.qos.ch">logback</a> which is designed to fail itself before it ever fails your application. One time we had a bug that could result in two instances of our application running at the same time. Only one of them was bound to the port that received connections. Our log rolling library would lock the log file during the roller over. Inevitably, the application not receiving requests would roll the logs and lock the other application out of ever writing to the log file.</li>
+            </ol>
+          </div>
+          <a class="u-url" href="/2018/01/07/testing-your-kinesis-stream-with-kinesalite.html" hidden></a>
+        </article>
+      </div>
+    </main>
+  </body>
+</html>
