@@ -4,22 +4,23 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="initial-scale=1, viewport-fit=cover">
     <meta name="google-site-verification" content="w449-YRInXMviD2YBTfFdb9hs54JylYloEurwuY9-nQ" />
-    <link rel="stylesheet" href="/assets/main.css"><!-- Begin Jekyll SEO tag v2.7.1 -->
+    <link rel="stylesheet" href="/assets/main.css"><!-- Begin Jekyll SEO tag v2.8.0 -->
     <title>Page 2 of 3 for Blog | Weinert Works</title>
-    <meta name="generator" content="Jekyll v4.2.1" />
+    <meta name="generator" content="Jekyll v4.3.1" />
     <meta property="og:title" content="Blog" />
     <meta property="og:locale" content="en_US" />
-    <meta name="description" content="The works of Jim Weinert. Apps, experiments, and personal blog." />
-    <meta property="og:description" content="The works of Jim Weinert. Apps, experiments, and personal blog." />
+    <meta name="description" content="The opinions and code of Jim Weinert." />
+    <meta property="og:description" content="The opinions and code of Jim Weinert." />
     <link rel="canonical" href="https://www.weinertworks.com/page2/" />
     <meta property="og:url" content="https://www.weinertworks.com/page2/" />
     <meta property="og:site_name" content="Weinert Works" />
+    <meta property="og:type" content="website" />
     <link rel="prev" href="https://www.weinertworks.com/" />
     <link rel="next" href="https://www.weinertworks.com/page3" />
     <meta name="twitter:card" content="summary" />
     <meta property="twitter:title" content="Blog" />
     <script type="application/ld+json">
-      {"@type":"WebPage","description":"The works of Jim Weinert. Apps, experiments, and personal blog.","url":"https://www.weinertworks.com/page2/","headline":"Blog","@context":"https://schema.org"}
+      {"@context":"https://schema.org","@type":"WebPage","description":"The opinions and code of Jim Weinert.","headline":"Blog","url":"https://www.weinertworks.com/page2/"}
     </script>
     <!-- End Jekyll SEO tag -->
     <link type="application/atom+xml" rel="alternate" href="https://www.weinertworks.com/feed.xml" title="Weinert Works" /></head>
@@ -39,6 +40,247 @@
       <div class="wrapper">
         <div class="blog">
           <ul class="post-list">
+            <li>
+              <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+                <h1 class="post-title p-name" itemprop="name headline">
+                  <a class="post-link" href="/2018/04/05/tictactoe-scala-2.html">TicTacToe.scala Part II</a>
+                </h1>
+                <p class="post-meta">
+                  <time class="dt-published" datetime="2018-04-05T20:52:13-05:00" itemprop="datePublished">
+                    Apr 5, 2018
+                  </time>• <span itemprop="author" itemscope itemtype="http://schema.org/Person"><span class="p-author h-card" itemprop="name">Jim</span></span></p>
+                <div class="post-content e-content" itemprop="articleBody">
+                  <p>I was interviewing recently and we discussed ways to improve my <a href="/2016/10/24/tictactoe-scala.html">TicTacToe code</a>. Here’s version two!</p>
+                  <h2 id="the-code">The Code</h2>
+                  <figure class="highlight">
+                    <pre><code class="language-scala" data-lang="scala"><span class="k">import</span> <span class="nn">scala.annotation.tailrec</span>
+<span class="k">import</span> <span class="nn">scala.util.</span><span class="o">{</span><span class="nc">Try</span><span class="o">,</span> <span class="nc">Success</span><span class="o">,</span> <span class="nc">Failure</span><span class="o">}</span>
+
+<span class="k">sealed</span> <span class="k">trait</span> <span class="nc">Player</span>
+<span class="k">case</span> <span class="k">object</span> <span class="nc">X</span> <span class="k">extends</span> <span class="nc">Player</span> <span class="o">{</span>
+  <span class="k">override</span> <span class="k">def</span> <span class="nf">toString</span><span class="k">:</span> <span class="kt">String</span> <span class="o">=</span> <span class="o">{</span>
+    <span class="s">"X"</span>
+  <span class="o">}</span>
+<span class="o">}</span>
+<span class="k">case</span> <span class="k">object</span> <span class="nc">O</span> <span class="k">extends</span> <span class="nc">Player</span> <span class="o">{</span>
+  <span class="k">override</span> <span class="k">def</span> <span class="nf">toString</span><span class="k">:</span> <span class="kt">String</span> <span class="o">=</span> <span class="o">{</span>
+    <span class="s">"O"</span>
+  <span class="o">}</span>
+<span class="o">}</span>
+
+<span class="k">sealed</span> <span class="k">trait</span> <span class="nc">Status</span>
+<span class="k">case</span> <span class="k">class</span> <span class="nc">Winner</span><span class="o">(</span><span class="n">player</span><span class="k">:</span> <span class="kt">Player</span><span class="o">)</span> <span class="k">extends</span> <span class="nc">Status</span>
+<span class="k">case</span> <span class="k">object</span> <span class="nc">InProgress</span> <span class="k">extends</span> <span class="nc">Status</span>
+<span class="k">case</span> <span class="k">object</span> <span class="nc">Draw</span> <span class="k">extends</span> <span class="nc">Status</span>
+
+<span class="k">case</span> <span class="k">class</span> <span class="nc">Tile</span><span class="o">(</span><span class="n">loc</span><span class="k">:</span> <span class="kt">Int</span><span class="o">,</span> <span class="n">owner</span><span class="k">:</span> <span class="kt">Option</span><span class="o">[</span><span class="kt">Player</span><span class="o">])</span> <span class="o">{</span>
+  <span class="k">override</span> <span class="k">def</span> <span class="nf">toString</span><span class="k">:</span> <span class="kt">String</span> <span class="o">=</span> <span class="nv">owner</span><span class="o">.</span><span class="py">map</span><span class="o">(</span><span class="nv">_</span><span class="o">.</span><span class="py">toString</span><span class="o">).</span><span class="py">getOrElse</span><span class="o">(</span><span class="n">s</span><span class="s">"$loc"</span><span class="o">)</span>
+<span class="o">}</span>
+
+<span class="k">val</span> <span class="nv">boardWidth</span> <span class="k">=</span> <span class="mi">3</span>
+<span class="k">val</span> <span class="nv">blankState</span> <span class="k">=</span> <span class="o">(</span><span class="mi">0</span> <span class="n">until</span> <span class="n">boardWidth</span> <span class="o">*</span> <span class="n">boardWidth</span><span class="o">).</span><span class="py">map</span><span class="o">(</span><span class="n">loc</span> <span class="k">=&gt;</span> <span class="k">new</span> <span class="nc">Tile</span><span class="o">(</span><span class="n">loc</span><span class="o">,</span> <span class="nc">None</span><span class="o">))</span>
+
+<span class="k">class</span> <span class="nc">Board</span><span class="o">(</span><span class="n">state</span><span class="k">:</span> <span class="kt">IndexedSeq</span><span class="o">[</span><span class="kt">Tile</span><span class="o">],</span> <span class="k">val</span> <span class="nv">currentPlayer</span><span class="k">:</span> <span class="kt">Player</span><span class="o">,</span> <span class="k">val</span> <span class="nv">gameStatus</span><span class="k">:</span> <span class="kt">Status</span><span class="o">)</span> <span class="o">{</span>
+  <span class="k">def</span> <span class="nf">move</span><span class="o">(</span><span class="n">loc</span><span class="k">:</span> <span class="kt">Int</span><span class="o">)</span> <span class="k">:</span> <span class="kt">Board</span> <span class="o">=</span> <span class="o">{</span>
+    <span class="nf">val</span> <span class="o">(</span><span class="n">front</span><span class="o">,</span> <span class="n">back</span><span class="o">)</span> <span class="k">=</span> <span class="nv">state</span><span class="o">.</span><span class="py">splitAt</span><span class="o">(</span><span class="n">loc</span><span class="o">)</span>
+
+    <span class="k">val</span> <span class="nv">newBack</span> <span class="k">=</span> <span class="nf">if</span> <span class="o">(!</span><span class="nv">back</span><span class="o">.</span><span class="py">isEmpty</span> <span class="o">&amp;&amp;</span> <span class="nv">back</span><span class="o">.</span><span class="py">head</span><span class="o">.</span><span class="py">owner</span><span class="o">.</span><span class="py">isEmpty</span><span class="o">)</span> <span class="o">{</span>
+      <span class="k">val</span> <span class="nv">newTile</span> <span class="k">=</span> <span class="nv">back</span><span class="o">.</span><span class="py">head</span><span class="o">.</span><span class="py">copy</span><span class="o">(</span><span class="n">owner</span> <span class="k">=</span> <span class="nc">Some</span><span class="o">(</span><span class="n">currentPlayer</span><span class="o">))</span>
+      <span class="n">newTile</span> <span class="o">+:</span> <span class="nv">back</span><span class="o">.</span><span class="py">tail</span>
+    <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
+      <span class="k">throw</span> <span class="k">new</span> <span class="nc">Exception</span><span class="o">(</span><span class="n">s</span><span class="s">"Invalid location $loc"</span><span class="o">)</span>
+    <span class="o">}</span>
+
+    <span class="k">val</span> <span class="nv">newState</span> <span class="k">=</span> <span class="n">front</span> <span class="o">++</span> <span class="n">newBack</span>
+    <span class="k">val</span> <span class="nv">newStatus</span> <span class="k">=</span> <span class="nf">getNewStatus</span><span class="o">(</span><span class="n">newState</span><span class="o">,</span> <span class="n">loc</span><span class="o">)</span>
+    <span class="k">new</span> <span class="nc">Board</span><span class="o">(</span><span class="n">newState</span><span class="o">,</span> <span class="n">otherPlayer</span><span class="o">,</span> <span class="n">newStatus</span><span class="o">)</span>
+  <span class="o">}</span>
+
+  <span class="k">private</span> <span class="k">def</span> <span class="nf">otherPlayer</span> <span class="k">:</span> <span class="kt">Player</span> <span class="o">=</span> <span class="o">{</span>
+    <span class="n">currentPlayer</span> <span class="k">match</span> <span class="o">{</span>
+      <span class="k">case</span> <span class="n">X</span> <span class="k">=&gt;</span> <span class="n">O</span>
+      <span class="k">case</span> <span class="n">O</span> <span class="k">=&gt;</span> <span class="n">X</span>
+    <span class="o">}</span>
+  <span class="o">}</span>
+
+  <span class="k">private</span> <span class="k">def</span> <span class="nf">getNewStatus</span><span class="o">(</span><span class="n">newState</span><span class="k">:</span> <span class="kt">IndexedSeq</span><span class="o">[</span><span class="kt">Tile</span><span class="o">],</span> <span class="n">loc</span><span class="k">:</span> <span class="kt">Int</span><span class="o">)</span> <span class="k">:</span> <span class="kt">Status</span> <span class="o">=</span> <span class="o">{</span>
+    <span class="c1">// val (x, y) = (v % 3, v / 3)</span>
+    <span class="c1">// 0,0 | 1,0 | 2,0</span>
+    <span class="c1">// 0,1 | 1,1 | 2,1</span>
+    <span class="c1">// 0,2 | 1,2 | 2,2</span>
+    <span class="nf">val</span> <span class="o">(</span><span class="n">x</span><span class="o">,</span> <span class="n">y</span><span class="o">)</span> <span class="k">=</span> <span class="o">(</span><span class="n">loc</span> <span class="o">%</span> <span class="n">boardWidth</span><span class="o">,</span> <span class="n">loc</span> <span class="o">/</span> <span class="n">boardWidth</span><span class="o">)</span>
+    <span class="k">val</span> <span class="nv">countUp</span> <span class="k">=</span> <span class="o">(</span><span class="mi">0</span> <span class="n">until</span> <span class="n">boardWidth</span><span class="o">)</span>
+    <span class="k">val</span> <span class="nv">countDown</span> <span class="k">=</span> <span class="o">(</span><span class="n">boardWidth</span> <span class="o">-</span> <span class="mi">1</span> <span class="n">to</span> <span class="mi">0</span> <span class="n">by</span> <span class="o">-</span><span class="mi">1</span><span class="o">)</span>
+
+    <span class="k">def</span> <span class="nf">rowVictory</span> <span class="k">:</span> <span class="kt">Boolean</span> <span class="o">=</span> <span class="nv">countUp</span><span class="o">.</span><span class="py">forall</span> <span class="o">{</span> <span class="n">idx</span> <span class="k">=&gt;</span>
+      <span class="k">val</span> <span class="nv">owner</span> <span class="k">=</span> <span class="nf">newState</span><span class="o">(</span><span class="n">idx</span> <span class="o">+</span> <span class="n">boardWidth</span> <span class="o">*</span> <span class="n">y</span><span class="o">).</span><span class="py">owner</span>
+      <span class="n">owner</span> <span class="o">==</span> <span class="nc">Some</span><span class="o">(</span><span class="n">currentPlayer</span><span class="o">)</span>
+    <span class="o">}</span>
+
+    <span class="k">def</span> <span class="nf">columnVictory</span> <span class="k">:</span> <span class="kt">Boolean</span> <span class="o">=</span> <span class="nv">countUp</span><span class="o">.</span><span class="py">forall</span> <span class="o">{</span> <span class="n">idx</span> <span class="k">=&gt;</span>
+      <span class="k">val</span> <span class="nv">owner</span> <span class="k">=</span> <span class="nf">newState</span><span class="o">(</span><span class="n">x</span> <span class="o">+</span> <span class="n">boardWidth</span> <span class="o">*</span> <span class="n">idx</span><span class="o">).</span><span class="py">owner</span>
+      <span class="n">owner</span> <span class="o">==</span> <span class="nc">Some</span><span class="o">(</span><span class="n">currentPlayer</span><span class="o">)</span>
+    <span class="o">}</span>
+
+    <span class="k">def</span> <span class="nf">diagonalVictory</span> <span class="k">:</span> <span class="kt">Boolean</span> <span class="o">=</span> <span class="o">{</span>
+      <span class="k">val</span> <span class="nv">isDiagonal</span> <span class="k">=</span> <span class="n">x</span> <span class="o">==</span> <span class="n">y</span> <span class="o">||</span> <span class="n">x</span> <span class="o">+</span> <span class="n">y</span> <span class="o">==</span> <span class="o">(</span><span class="n">boardWidth</span> <span class="o">-</span> <span class="mi">1</span><span class="o">)</span>
+
+      <span class="k">lazy</span> <span class="k">val</span> <span class="nv">upDiagonal</span> <span class="k">=</span> <span class="nv">countUp</span><span class="o">.</span><span class="py">forall</span> <span class="o">{</span> <span class="n">idx</span> <span class="k">=&gt;</span>
+        <span class="k">val</span> <span class="nv">owner</span> <span class="k">=</span> <span class="nf">newState</span><span class="o">(</span><span class="n">idx</span> <span class="o">+</span> <span class="n">boardWidth</span> <span class="o">*</span> <span class="n">idx</span><span class="o">).</span><span class="py">owner</span>
+        <span class="n">owner</span> <span class="o">==</span> <span class="nc">Some</span><span class="o">(</span><span class="n">currentPlayer</span><span class="o">)</span>
+      <span class="o">}</span>
+
+      <span class="k">lazy</span> <span class="k">val</span> <span class="nv">downDiagonal</span> <span class="k">=</span> <span class="nv">countUp</span><span class="o">.</span><span class="py">zip</span><span class="o">(</span><span class="n">countDown</span><span class="o">).</span><span class="py">forall</span> <span class="o">{</span> <span class="nf">case</span> <span class="o">(</span><span class="n">idx</span><span class="o">,</span> <span class="n">idy</span><span class="o">)</span> <span class="k">=&gt;</span>
+        <span class="k">val</span> <span class="nv">owner</span> <span class="k">=</span> <span class="nf">newState</span><span class="o">(</span><span class="n">idx</span> <span class="o">+</span> <span class="n">boardWidth</span> <span class="o">*</span> <span class="n">idy</span><span class="o">).</span><span class="py">owner</span>
+        <span class="n">owner</span> <span class="o">==</span> <span class="nc">Some</span><span class="o">(</span><span class="n">currentPlayer</span><span class="o">)</span>
+      <span class="o">}</span>
+
+      <span class="n">isDiagonal</span> <span class="o">&amp;&amp;</span> <span class="o">(</span><span class="n">upDiagonal</span> <span class="o">||</span> <span class="n">downDiagonal</span><span class="o">)</span>
+    <span class="o">}</span>
+
+    <span class="nf">if</span> <span class="o">(</span><span class="n">rowVictory</span> <span class="o">||</span> <span class="n">columnVictory</span> <span class="o">||</span> <span class="n">diagonalVictory</span><span class="o">)</span> <span class="o">{</span>
+      <span class="nc">Winner</span><span class="o">(</span><span class="n">currentPlayer</span><span class="o">)</span>
+    <span class="o">}</span> <span class="k">else</span> <span class="nf">if</span> <span class="o">(</span><span class="nv">newState</span><span class="o">.</span><span class="py">exists</span><span class="o">(</span><span class="nv">_</span><span class="o">.</span><span class="py">owner</span><span class="o">.</span><span class="py">isEmpty</span><span class="o">))</span> <span class="o">{</span>
+      <span class="nc">InProgress</span>
+    <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
+      <span class="nc">Draw</span>
+    <span class="o">}</span>
+  <span class="o">}</span>
+
+  <span class="k">override</span> <span class="k">def</span> <span class="nf">toString</span> <span class="k">:</span> <span class="kt">String</span> <span class="o">=</span> <span class="o">{</span>
+    <span class="nv">state</span><span class="o">.</span><span class="py">grouped</span><span class="o">(</span><span class="n">boardWidth</span><span class="o">).</span><span class="py">map</span><span class="o">(</span><span class="nv">_</span><span class="o">.</span><span class="py">mkString</span><span class="o">(</span><span class="s">"|"</span><span class="o">)).</span><span class="py">mkString</span><span class="o">(</span><span class="s">"\n"</span><span class="o">)</span>
+  <span class="o">}</span>
+<span class="o">}</span>
+
+<span class="nd">@tailrec</span>
+<span class="k">def</span> <span class="nf">playGame</span><span class="o">(</span><span class="n">game</span><span class="k">:</span> <span class="kt">Board</span><span class="o">)</span> <span class="k">:</span> <span class="kt">Unit</span> <span class="o">=</span> <span class="o">{</span>
+  <span class="nv">game</span><span class="o">.</span><span class="py">gameStatus</span> <span class="k">match</span> <span class="o">{</span>
+    <span class="k">case</span> <span class="nc">Winner</span><span class="o">(</span><span class="n">player</span><span class="o">)</span> <span class="k">=&gt;</span> <span class="nf">println</span><span class="o">(</span><span class="n">s</span><span class="s">"$player is victorious!\n$game"</span><span class="o">)</span>
+    <span class="k">case</span> <span class="nc">Draw</span> <span class="k">=&gt;</span> <span class="nf">println</span><span class="o">(</span><span class="n">s</span><span class="s">"There are no moves left. It's a stupid tie.\n$game"</span><span class="o">)</span>
+    <span class="k">case</span> <span class="nc">InProgress</span> <span class="k">=&gt;</span> <span class="o">{</span>
+      <span class="nf">println</span><span class="o">(</span><span class="n">s</span><span class="s">"Player ${game.currentPlayer}, your move"</span><span class="o">)</span>
+      <span class="nf">println</span><span class="o">(</span><span class="n">s</span><span class="s">"$game\n"</span><span class="o">)</span>
+
+      <span class="k">val</span> <span class="nv">nextMove</span> <span class="k">=</span> <span class="nv">scala</span><span class="o">.</span><span class="py">io</span><span class="o">.</span><span class="py">StdIn</span><span class="o">.</span><span class="py">readInt</span><span class="o">()</span>
+
+      <span class="nc">Try</span><span class="o">(</span><span class="nv">game</span><span class="o">.</span><span class="py">move</span><span class="o">(</span><span class="n">nextMove</span><span class="o">))</span> <span class="k">match</span> <span class="o">{</span>
+        <span class="k">case</span> <span class="nc">Success</span><span class="o">(</span><span class="n">newBoard</span><span class="o">)</span> <span class="k">=&gt;</span> <span class="nf">playGame</span><span class="o">(</span><span class="n">newBoard</span><span class="o">)</span>
+        <span class="k">case</span> <span class="nc">Failure</span><span class="o">(</span><span class="n">ex</span><span class="o">)</span> <span class="k">=&gt;</span> <span class="o">{</span>
+          <span class="nf">println</span><span class="o">(</span><span class="n">s</span><span class="s">"Error making a move\n$ex\n"</span><span class="o">)</span>
+          <span class="nf">playGame</span><span class="o">(</span><span class="n">game</span><span class="o">)</span>
+        <span class="o">}</span>
+      <span class="o">}</span>
+    <span class="o">}</span>
+  <span class="o">}</span>
+<span class="o">}</span>
+
+<span class="nf">playGame</span><span class="o">(</span><span class="k">new</span> <span class="nc">Board</span><span class="o">(</span><span class="n">blankState</span><span class="o">,</span> <span class="n">X</span><span class="o">,</span> <span class="nc">InProgress</span><span class="o">))</span></code></pre>
+                  </figure>
+                  <h2 id="improvements">Improvements</h2>
+                  <p>A bunch of the improvements were insignificant. The entire diff can be viewed <a href="https://gist.github.com/countingtoten/ce6fed843326ecf4ecf606b5ca10f040/revisions">here</a>.</p>
+                  <ul>
+                    <li>Parentheses were removed from methods that didn’t take any parameters.</li>
+                    <li>Default values for method parameters were removed to be clearer to the library user.</li>
+                    <li>The Owner type was removed since it didn’t add any clarity.</li>
+                    <li>The board length is now a variable, so you could easily play on an X by X game board.</li>
+                    <li>All internal methods are now private.</li>
+                  </ul>
+                  <h3 id="sealed-traits">Sealed Traits</h3>
+                  <p>I thought I knew about this when I first wrote TicTacToe. If the parent object of a case class is sealed, all match statements need to include every case. If every case isn’t covered, the match will throw a compile error.</p>
+                  <p>We’ll never need an instance of the parent class, so we can make the Player a trait.</p>
+                  <figure class="highlight">
+                    <pre><code class="language-scala" data-lang="scala"><span class="k">sealed</span> <span class="k">trait</span> <span class="nc">Player</span>
+
+<span class="k">sealed</span> <span class="k">trait</span> <span class="nc">Status</span></code></pre>
+                  </figure>
+                  <h3 id="case-objects">Case Objects</h3>
+                  <p>The player types, X and O, don’t need to hold a value, so we should use a case object instead of a case class. Case objects are singletons, so there is only ever one of them created.</p>
+                  <figure class="highlight">
+                    <pre><code class="language-scala" data-lang="scala"><span class="k">case</span> <span class="k">object</span> <span class="nc">X</span> <span class="k">extends</span> <span class="nc">Player</span> <span class="o">{</span>
+  <span class="k">override</span> <span class="k">def</span> <span class="nf">toString</span><span class="k">:</span> <span class="kt">String</span> <span class="o">=</span> <span class="o">{</span>
+    <span class="s">"X"</span>
+  <span class="o">}</span>
+<span class="o">}</span>
+<span class="k">case</span> <span class="k">object</span> <span class="nc">O</span> <span class="k">extends</span> <span class="nc">Player</span> <span class="o">{</span>
+  <span class="k">override</span> <span class="k">def</span> <span class="nf">toString</span><span class="k">:</span> <span class="kt">String</span> <span class="o">=</span> <span class="o">{</span>
+    <span class="s">"O"</span>
+  <span class="o">}</span>
+<span class="o">}</span></code></pre>
+                  </figure>
+                  <h3 id="use-an-indexedseq-instead-of-a-list">Use an IndexedSeq instead of a List</h3>
+                  <p>When writing a library, you want to use the most generic type possible.  We use an <a href="#tictactoe-2-aside1">IndexedSeq</a> instead of a Seq because the <a href="http://www.scala-lang.org/api/current/scala/collection/immutable/Range.html">Range type</a> inherits from IndexedSeq. For our TicTacToe board, no extra work is done to convert our board to an IndexedSeq.</p>
+                  <figure class="highlight">
+                    <pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="nv">blankState</span> <span class="k">=</span> <span class="o">(</span><span class="mi">0</span> <span class="n">until</span> <span class="n">boardWidth</span> <span class="o">*</span> <span class="n">boardWidth</span><span class="o">).</span><span class="py">map</span><span class="o">(</span><span class="n">loc</span> <span class="k">=&gt;</span> <span class="k">new</span> <span class="nc">Tile</span><span class="o">(</span><span class="n">loc</span><span class="o">,</span> <span class="nc">None</span><span class="o">))</span>
+
+<span class="k">class</span> <span class="nc">Board</span><span class="o">(</span><span class="n">state</span><span class="k">:</span> <span class="kt">IndexedSeq</span><span class="o">[</span><span class="kt">Tile</span><span class="o">],</span> <span class="k">val</span> <span class="nv">currentPlayer</span><span class="k">:</span> <span class="kt">Player</span><span class="o">,</span> <span class="k">val</span> <span class="nv">gameStatus</span><span class="k">:</span> <span class="kt">Status</span><span class="o">)</span> <span class="o">{</span></code></pre>
+                  </figure>
+                  <p>Since we’re using an IndexedSeq instead of a List, we need to change how we check if a tile is empty or not. The syntax for decomposing a Seq is messy and I always forget it. We can use the isEmpty methods to check that the board space exists and that the board space is empty.</p>
+                  <figure class="highlight">
+                    <pre><code class="language-scala" data-lang="scala"><span class="nf">val</span> <span class="o">(</span><span class="n">front</span><span class="o">,</span> <span class="n">back</span><span class="o">)</span> <span class="k">=</span> <span class="nv">state</span><span class="o">.</span><span class="py">splitAt</span><span class="o">(</span><span class="n">loc</span><span class="o">)</span>
+
+<span class="k">val</span> <span class="nv">newBack</span> <span class="k">=</span> <span class="nf">if</span> <span class="o">(!</span><span class="nv">back</span><span class="o">.</span><span class="py">isEmpty</span> <span class="o">&amp;&amp;</span> <span class="nv">back</span><span class="o">.</span><span class="py">head</span><span class="o">.</span><span class="py">owner</span><span class="o">.</span><span class="py">isEmpty</span><span class="o">)</span> <span class="o">{</span>
+  <span class="k">val</span> <span class="nv">newTile</span> <span class="k">=</span> <span class="nv">back</span><span class="o">.</span><span class="py">head</span><span class="o">.</span><span class="py">copy</span><span class="o">(</span><span class="n">owner</span> <span class="k">=</span> <span class="nc">Some</span><span class="o">(</span><span class="n">currentPlayer</span><span class="o">))</span>
+  <span class="n">newTile</span> <span class="o">+:</span> <span class="nv">back</span><span class="o">.</span><span class="py">tail</span>
+<span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
+  <span class="k">throw</span> <span class="k">new</span> <span class="nc">Exception</span><span class="o">(</span><span class="n">s</span><span class="s">"Invalid location $loc"</span><span class="o">)</span>
+<span class="o">}</span></code></pre>
+                  </figure>
+                  <h3 id="give-better-names-to-variables">Give Better Names to Variables</h3>
+                  <p>Rename nextPlayer to currentPlayer. I always confuse next Thursday and this coming Thursday. I don’t know why I thought nextPlayer was less confusing.</p>
+                  <h3 id="make-the-game-status-a-part-of-the-board-type">Make the Game Status a Part of the Board Type</h3>
+                  <p>The old TicTacToe would calculate the game status every time Board.gameState was called. This is the most expensive part of TicTacToe. We definitely want to calculate the new status only once when we create a new state for the board.</p>
+                  <figure class="highlight">
+                    <pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="nv">newState</span> <span class="k">=</span> <span class="n">front</span> <span class="o">++</span> <span class="n">newBack</span>
+<span class="k">val</span> <span class="nv">newStatus</span> <span class="k">=</span> <span class="nf">getNewStatus</span><span class="o">(</span><span class="n">newState</span><span class="o">,</span> <span class="n">loc</span><span class="o">)</span>
+<span class="k">new</span> <span class="nc">Board</span><span class="o">(</span><span class="n">newState</span><span class="o">,</span> <span class="n">otherPlayer</span><span class="o">,</span> <span class="n">newStatus</span><span class="o">)</span></code></pre>
+                  </figure>
+                  <p>One benefit of checking for victory when the user makes a moves is we only have to check the row, column, and diagonals for that move. We can ignore the entire rest of the board. We can split these checks into three different methods. Compare the new way of checking for a victory to the old way. The logic is simpler and we get to keep our immutable variables!</p>
+                  <figure class="highlight">
+                    <pre><code class="language-scala" data-lang="scala"><span class="c1">// Old way</span>
+<span class="k">def</span> <span class="nf">findWinner</span><span class="o">(</span><span class="n">values</span><span class="k">:</span> <span class="kt">List</span><span class="o">[</span><span class="kt">Owner</span><span class="o">])</span> <span class="k">:</span> <span class="kt">Status</span> <span class="o">=</span> <span class="n">values</span> <span class="k">match</span> <span class="o">{</span>
+  <span class="k">case</span> <span class="nc">List</span><span class="o">()</span> <span class="k">=&gt;</span> <span class="nc">InProgress</span><span class="o">()</span>
+  <span class="k">case</span> <span class="n">head</span> <span class="o">::</span> <span class="n">tail</span> <span class="k">=&gt;</span> <span class="n">head</span> <span class="k">match</span> <span class="o">{</span>
+    <span class="k">case</span> <span class="nc">Some</span><span class="o">(</span><span class="n">x</span><span class="o">)</span> <span class="k">=&gt;</span> <span class="nc">Winner</span><span class="o">(</span><span class="n">x</span><span class="o">)</span>
+    <span class="k">case</span> <span class="nc">None</span> <span class="k">=&gt;</span> <span class="nf">findWinner</span><span class="o">(</span><span class="n">tail</span><span class="o">)</span>
+  <span class="o">}</span>
+<span class="o">}</span>
+
+<span class="nf">if</span> <span class="o">(</span><span class="n">movesLeft</span> <span class="o">==</span> <span class="mi">0</span><span class="o">)</span> <span class="o">{</span>
+  <span class="nc">Draw</span><span class="o">()</span>
+<span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
+  <span class="nf">findWinner</span><span class="o">(</span><span class="nv">placements</span><span class="o">.</span><span class="py">values</span><span class="o">.</span><span class="py">toList</span><span class="o">)</span>
+<span class="o">}</span>
+
+<span class="c1">// New way</span>
+<span class="nf">if</span> <span class="o">(</span><span class="n">rowVictory</span> <span class="o">||</span> <span class="n">columnVictory</span> <span class="o">||</span> <span class="n">diagonalVictory</span><span class="o">)</span> <span class="o">{</span>
+  <span class="nc">Winner</span><span class="o">(</span><span class="n">currentPlayer</span><span class="o">)</span>
+<span class="o">}</span> <span class="k">else</span> <span class="nf">if</span> <span class="o">(</span><span class="nv">newState</span><span class="o">.</span><span class="py">exists</span><span class="o">(</span><span class="nv">_</span><span class="o">.</span><span class="py">owner</span><span class="o">.</span><span class="py">isEmpty</span><span class="o">))</span> <span class="o">{</span>
+  <span class="nc">InProgress</span>
+<span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
+  <span class="nc">Draw</span>
+<span class="o">}</span></code></pre>
+                  </figure>
+                  <h3 id="refactor-the-game-loop-to-be-tail-recursive">Refactor the Game Loop to be Tail Recursive</h3>
+                  <p>The TicTacToe game is recursive. We want it to be tail recursive, so it will reuse the same stack frame instead of indefinitely growing the stack. Our entire game logic is wrapped in a try catch block, but only the game.move method can throw an exception. Instead of using a lowercase try, we can use an uppercase Try, specifically a scala.util.Try. By wrapping our execution in a Try, we can assign it to a variable and use a match statement. Now our Try block has a clear execution path and always calls playGame in the tail position.</p>
+                  <figure class="highlight">
+                    <pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="nv">nextMove</span> <span class="k">=</span> <span class="nv">scala</span><span class="o">.</span><span class="py">io</span><span class="o">.</span><span class="py">StdIn</span><span class="o">.</span><span class="py">readInt</span><span class="o">()</span>
+
+<span class="nc">Try</span><span class="o">(</span><span class="nv">game</span><span class="o">.</span><span class="py">move</span><span class="o">(</span><span class="n">nextMove</span><span class="o">))</span> <span class="k">match</span> <span class="o">{</span>
+  <span class="k">case</span> <span class="nc">Success</span><span class="o">(</span><span class="n">newBoard</span><span class="o">)</span> <span class="k">=&gt;</span> <span class="nf">playGame</span><span class="o">(</span><span class="n">newBoard</span><span class="o">)</span>
+  <span class="k">case</span> <span class="nc">Failure</span><span class="o">(</span><span class="n">ex</span><span class="o">)</span> <span class="k">=&gt;</span> <span class="o">{</span>
+    <span class="nf">println</span><span class="o">(</span><span class="n">s</span><span class="s">"Error making a move\n$ex\n"</span><span class="o">)</span>
+    <span class="nf">playGame</span><span class="o">(</span><span class="n">game</span><span class="o">)</span>
+  <span class="o">}</span>
+<span class="o">}</span></code></pre>
+                  </figure>
+                  <h2 id="asides">Asides</h2>
+                  <ol>
+                    <li id="tictactoe-2-aside1">Using an IndexedSeq instead of a List doesn't make a lot of sense in our example, but it was something I learned when reviewing my TicTacToe implementation with someone who knows Scala better than me. Seqs have worse syntax for decomposing them into a head and a tail than Lists do.
+                    </li>
+                  </ol>
+                </div>
+              </article>
+            </li>
             <li>
               <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
                 <h1 class="post-title p-name" itemprop="name headline">
@@ -668,20 +910,6 @@ pg_upgrade <span class="se">\</span>
                     </li>
                     <li id="tictactoe-1-aside3">Outside of my tic tac toe code, which is entirely my bad code, Scala has issues. Its immutability and static typing is a huge pain when you're trying to parse JSON.</li>
                   </ol>
-                </div>
-              </article>
-            </li>
-            <li>
-              <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
-                <h1 class="post-title p-name" itemprop="name headline">
-                  <a class="post-link" href="/2016/10/13/if-youve-ever-felt-bad-because-you-couldnt-find-a-job.html">If You&#39;ve Ever Felt Bad Because You Couldn&#39;t Find a Job...</a>
-                </h1>
-                <p class="post-meta">
-                  <time class="dt-published" datetime="2016-10-13T00:13:53-05:00" itemprop="datePublished">
-                    Oct 13, 2016
-                  </time>• <span itemprop="author" itemscope itemtype="http://schema.org/Person"><span class="p-author h-card" itemprop="name">Jim</span></span></p>
-                <div class="post-content e-content" itemprop="articleBody">
-                  <p>…you should read <a href="http://danluu.com/hiring-lemons/">“Developer hiring and the market for lemons” by Dan Luu</a> about the four dumb excuses companies give for not being able to find good employees. It’ll make you feel better about how arbitrary it all is.</p>
                 </div>
               </article>
             </li>
